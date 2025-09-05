@@ -105,7 +105,7 @@ export default function DashboardPage() {
                 </div>
                 <CardDescription>{pkg.id}</CardDescription>
               </CardHeader>
-              <CardContent className="flex-1">
+              <CardContent>
                 <div className="space-y-2 text-sm">
                   <p><span className="font-medium text-muted-foreground">Customer:</span> {pkg.customer.name}</p>
                   <p><span className="font-medium text-muted-foreground">Contractor:</span> {pkg.contractor.name}</p>

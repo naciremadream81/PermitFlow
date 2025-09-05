@@ -39,6 +39,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { pdfTemplates } from '@/lib/data';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Textarea } from './ui/textarea';
+import { cn } from '@/lib/utils';
 
 interface PermitDetailSheetProps {
   permit: PermitPackage | null;
@@ -196,9 +197,11 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
         <SheetContent className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col">
           <SheetHeader>
             <SheetTitle className="text-2xl">{permit.packageName}</SheetTitle>
-            <SheetDescription className="flex items-center gap-2">
-              ID: {permit.id}
-              <Badge className={statusColors[permit.status]}>{permit.status}</Badge>
+            <SheetDescription asChild>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                ID: {permit.id}
+                <Badge className={statusColors[permit.status]}>{permit.status}</Badge>
+              </div>
             </SheetDescription>
           </SheetHeader>
           <Separator className="my-4" />
