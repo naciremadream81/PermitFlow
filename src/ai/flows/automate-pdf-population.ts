@@ -19,7 +19,7 @@ const AutomatePdfPopulationInputSchema = z.object({
   pdfTemplateDataUri: z
     .string()
     .describe(
-      'The PDF template to populate, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.' 
+      'The PDF template to populate, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.'
     ),
 });
 export type AutomatePdfPopulationInput = z.infer<typeof AutomatePdfPopulationInputSchema>;
@@ -33,36 +33,19 @@ export async function automatePdfPopulation(input: AutomatePdfPopulationInput): 
   return automatePdfPopulationFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'automatePdfPopulationPrompt',
-  input: {schema: AutomatePdfPopulationInputSchema},
-  output: {schema: AutomatePdfPopulationOutputSchema},
-  prompt: `You are an AI assistant designed to populate PDF forms with provided data.
-
-You will receive customer, contractor, property, and permit data, as well as a PDF template.
-
-Your task is to analyze the data and populate the PDF template accurately.
-
-Return the populated PDF form as a data URI.
-
-Customer Data: {{{customerData}}}
-Contractor Data: {{{contractorData}}}
-Property Data: {{{propertyData}}}
-Permit Data: {{{permitData}}}
-PDF Template: {{media url=pdfTemplateDataUri}}
-
-Ensure that all relevant fields in the PDF are filled with the correct information.
-`,
-});
-
+// NOTE: This is a placeholder flow for demonstration purposes.
+// A real implementation would use a PDF library to fill the form fields.
 const automatePdfPopulationFlow = ai.defineFlow(
   {
     name: 'automatePdfPopulationFlow',
     inputSchema: AutomatePdfPopulationInputSchema,
     outputSchema: AutomatePdfPopulationOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    // For now, just return the original template data URI.
+    // This simulates a successful PDF generation for download.
+    return {
+      populatedPdfDataUri: input.pdfTemplateDataUri,
+    };
   }
 );
