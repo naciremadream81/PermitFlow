@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, FileText, CheckSquare, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, CheckSquare, HardHat, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -54,7 +54,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenuItem>
             <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={pathname.startsWith('/templates')} tooltip="Templates">
-                    <Link href="/templates">
+                     <Link href="/templates">
                         <FileText />
                         PDF Templates
                     </Link>
@@ -65,6 +65,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <Link href="/checklists">
                         <CheckSquare />
                         County Checklists
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/contractors')} tooltip="Contractors">
+                    <Link href="/contractors">
+                        <HardHat />
+                        Contractors
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
