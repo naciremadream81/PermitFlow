@@ -26,6 +26,7 @@ const packageSchema = z.object({
   county: z.string().min(1, 'Please select a county'),
   customerName: z.string().min(2, 'Customer name is required'),
   customerEmail: z.string().email('Invalid email address'),
+  customerPhone: z.string().optional(),
   contractorId: z.string().min(1, 'Please select a contractor'),
   permitTypeId: z.string().min(1, 'Please select a permit type'),
   propertyAddress: z.string().min(5, 'Property address is required'),
@@ -33,6 +34,11 @@ const packageSchema = z.object({
   descriptionOfWork: z.string().min(10, 'Please provide a brief description of the work.'),
   buildingUse: z.string().min(3, 'Building use is required.'),
   constructionCost: z.coerce.number().min(0, 'Construction cost must be a positive number.'),
+  acTons: z.coerce.number().optional(),
+  heatKw: z.coerce.number().optional(),
+  septicPermitOrSewerCompany: z.string().optional(),
+  electricalServiceAmps: z.coerce.number().optional(),
+  waterServiceSource: z.string().optional(),
 });
 
 type PackageFormValues = z.infer<typeof packageSchema>;
@@ -51,6 +57,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
       county: '',
       customerName: '',
       customerEmail: '',
+      customerPhone: '',
       contractorId: '',
       permitTypeId: '',
       propertyAddress: '',
@@ -58,6 +65,11 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
       descriptionOfWork: '',
       buildingUse: '',
       constructionCost: 0,
+      acTons: undefined,
+      heatKw: undefined,
+      septicPermitOrSewerCompany: '',
+      electricalServiceAmps: undefined,
+      waterServiceSource: '',
     },
   });
 
@@ -83,7 +95,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         id: `cust_${Date.now()}`,
         name: data.customerName,
         email: data.customerEmail,
-        phone: 'N/A', // Placeholder
+        phone: data.customerPhone || 'N/A',
         address: { street: '', city: '', state: '', zip: '' }, // Placeholder
       },
       contractor: selectedContractor,
@@ -103,6 +115,11 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
       descriptionOfWork: data.descriptionOfWork,
       buildingUse: data.buildingUse,
       constructionCost: data.constructionCost,
+      acTons: data.acTons,
+      heatKw: data.heatKw,
+      septicPermitOrSewerCompany: data.septicPermitOrSewerCompany,
+      electricalServiceAmps: data.electricalServiceAmps,
+      waterServiceSource: data.waterServiceSource,
     };
     onPackageCreate(newPackage);
     onOpenChange(false);
@@ -172,6 +189,55 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                 )}
               />
             </div>
+
+            <div className="space-y-2">
+                <h3 className="text-sm font-medium text-muted-foreground">System Specifications</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 rounded-lg border p-4">
+                    <FormField control={form.control} name="acTons" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>A/C Tons</FormLabel>
+                            <FormControl><Input type="number" placeholder="3.5" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="heatKw" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Heat (kW)</FormLabel>
+                            <FormControl><Input type="number" placeholder="10" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="electricalServiceAmps" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Electrical (Amps)</FormLabel>
+                            <FormControl><Input type="number" placeholder="200" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <h3 className="text-sm font-medium text-muted-foreground">Utilities</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
+                    <FormField control={form.control} name="septicPermitOrSewerCompany" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Septic/Sewer</FormLabel>
+                            <FormControl><Input placeholder="Charlotte County Utilities" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                    <FormField control={form.control} name="waterServiceSource" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Water Source</FormLabel>
+                            <FormControl><Input placeholder="City Water" {...field} /></FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}/>
+                </div>
+            </div>
+
+
             <div className="space-y-2">
               <h3 className="text-sm font-medium text-muted-foreground">Location & Type</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
@@ -280,6 +346,19 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input placeholder="john.doe@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="customerPhone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="555-123-4567" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
