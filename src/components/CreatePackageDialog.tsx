@@ -73,21 +73,24 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
     },
   });
 
-  function onSubmit(data: PackageFormValues) {
+  const onSubmit = (data: PackageFormValues) => {
     const selectedContractor = contractors.find(c => c.id === data.contractorId);
     if (!selectedContractor) {
-        // This should not happen due to form validation, but it's a good safeguard.
-        console.error("Selected contractor not found!");
-        return;
+      console.error("Selected contractor not found!");
+      return;
     }
+    
     const selectedPermitType = permitTypes.find(pt => pt.id === data.permitTypeId);
     const countyChecklist = countyData.find(c => c.name === data.county)?.checklist || [];
     
-    const newChecklist = (selectedPermitType?.checklist || []).map((item, index) => ({
-        id: `new_${data.county}_${selectedPermitType!.id}_${index}`,
-        text: item.text,
-        completed: false,
-    }));
+    let newChecklist = [];
+    if (selectedPermitType?.checklist) {
+      newChecklist = selectedPermitType.checklist.map((item, index) => ({
+          id: `new_${data.county}_${selectedPermitType!.id}_${index}`,
+          text: item.text,
+          completed: false,
+      }));
+    }
 
     if(newChecklist.length === 0){
         newChecklist.push(...countyChecklist);
@@ -103,7 +106,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         name: data.customerName,
         email: data.customerEmail,
         phone: data.customerPhone || 'N/A',
-        address: { street: '', city: '', state: '', zip: '' }, // Placeholder, can be expanded later
+        address: { street: '', city: '', state: '', zip: '' }, // Placeholder
       },
       contractor: selectedContractor,
       property: {
@@ -131,7 +134,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
     onPackageCreate(newPackage);
     onOpenChange(false);
     form.reset();
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
