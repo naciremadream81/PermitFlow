@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, FileText, CheckSquare, HardHat, LogOut } from 'lucide-react';
+import { LayoutDashboard, FileText, CheckSquare, HardHat, LogOut, BarChart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -73,6 +73,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <Link href="/contractors">
                         <HardHat />
                         Contractors
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/reports')} tooltip="Reports">
+                    <Link href="/reports">
+                        <BarChart />
+                        Reports
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>

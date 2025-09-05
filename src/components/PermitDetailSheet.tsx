@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -26,7 +27,8 @@ import {
   X,
   Building,
   Wrench,
-  DollarSign
+  DollarSign,
+  DownloadCloud
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
@@ -88,6 +90,24 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     setAttachments(updatedAttachments);
     onUpdatePackage({ ...permit, attachments: updatedAttachments });
   };
+  
+  const handleDownloadAll = () => {
+    if (attachments.length === 0) {
+      toast({ variant: 'destructive', title: 'No files to download' });
+      return;
+    }
+    // This is a simplified download. A real app might zip these on a server.
+    attachments.forEach(file => {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(file);
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+    });
+    toast({ title: 'Success', description: 'Your downloads have started.' });
+  }
 
 
   const handleGeneratePdf = async () => {
@@ -198,7 +218,13 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
           <Separator />
 
           <div>
-            <h3 className="text-lg font-semibold mb-3">Attachments</h3>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold">Attachments</h3>
+              <Button variant="secondary" size="sm" onClick={handleDownloadAll} disabled={attachments.length === 0}>
+                <DownloadCloud className="mr-2 h-4 w-4" />
+                Download All
+              </Button>
+            </div>
             <div className="space-y-2">
                {attachments.map((file, index) => (
                 <div key={index} className="flex items-center justify-between p-2 rounded-md border bg-secondary/50">
