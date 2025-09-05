@@ -17,7 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { floridaCounties, contractors, permitTypes, countyData } from '@/lib/data';
-import type { PermitPackage, Contractor } from '@/lib/types';
+import type { PermitPackage } from '@/lib/types';
 import { PlusCircle } from 'lucide-react';
 import { Textarea } from './ui/textarea';
 
@@ -74,17 +74,24 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
   });
 
   function onSubmit(data: PackageFormValues) {
-    const selectedContractor = contractors.find(c => c.id === data.contractorId) as Contractor;
+    const selectedContractor = contractors.find(c => c.id === data.contractorId);
+    if (!selectedContractor) {
+        // This should not happen due to form validation, but it's a good safeguard.
+        console.error("Selected contractor not found!");
+        return;
+    }
     const selectedPermitType = permitTypes.find(pt => pt.id === data.permitTypeId);
     const countyChecklist = countyData.find(c => c.name === data.county)?.checklist || [];
     
-    const newChecklist = selectedPermitType
-      ? selectedPermitType.checklist.map((item, index) => ({
-          id: `new_${data.county}_${selectedPermitType.id}_${index}`,
-          text: item.text,
-          completed: false,
-        }))
-      : countyChecklist;
+    const newChecklist = (selectedPermitType?.checklist || []).map((item, index) => ({
+        id: `new_${data.county}_${selectedPermitType!.id}_${index}`,
+        text: item.text,
+        completed: false,
+    }));
+
+    if(newChecklist.length === 0){
+        newChecklist.push(...countyChecklist);
+    }
 
     const newPackage: PermitPackage = {
       id: `PKG-${Date.now()}`,
@@ -96,7 +103,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         name: data.customerName,
         email: data.customerEmail,
         phone: data.customerPhone || 'N/A',
-        address: { street: '', city: '', state: '', zip: '' }, // Placeholder
+        address: { street: '', city: '', state: '', zip: '' }, // Placeholder, can be expanded later
       },
       contractor: selectedContractor,
       property: {
@@ -104,9 +111,9 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         parcelId: data.parcelId,
         address: {
           street: data.propertyAddress,
-          city: 'N/A', // Placeholder
+          city: '', // Placeholder
           state: 'FL', // Placeholder
-          zip: 'N/A', // Placeholder
+          zip: '', // Placeholder
         },
       },
       checklist: newChecklist,
@@ -196,21 +203,21 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                     <FormField control={form.control} name="acTons" render={({ field }) => (
                         <FormItem>
                             <FormLabel>A/C Tons</FormLabel>
-                            <FormControl><Input type="number" placeholder="3.5" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="3.5" {...field} value={field.value ?? ''} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}/>
                     <FormField control={form.control} name="heatKw" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Heat (kW)</FormLabel>
-                            <FormControl><Input type="number" placeholder="10" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="10" {...field} value={field.value ?? ''} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}/>
                     <FormField control={form.control} name="electricalServiceAmps" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Electrical (Amps)</FormLabel>
-                            <FormControl><Input type="number" placeholder="200" {...field} /></FormControl>
+                            <FormControl><Input type="number" placeholder="200" {...field} value={field.value ?? ''} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}/>
@@ -223,14 +230,14 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                     <FormField control={form.control} name="septicPermitOrSewerCompany" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Septic/Sewer</FormLabel>
-                            <FormControl><Input placeholder="Charlotte County Utilities" {...field} /></FormControl>
+                            <FormControl><Input placeholder="Charlotte County Utilities" {...field} value={field.value ?? ''} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}/>
                     <FormField control={form.control} name="waterServiceSource" render={({ field }) => (
                         <FormItem>
                             <FormLabel>Water Source</FormLabel>
-                            <FormControl><Input placeholder="City Water" {...field} /></FormControl>
+                            <FormControl><Input placeholder="City Water" {...field} value={field.value ?? ''} /></FormControl>
                             <FormMessage />
                         </FormItem>
                     )}/>
@@ -358,7 +365,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                     <FormItem>
                       <FormLabel>Phone</FormLabel>
                       <FormControl>
-                        <Input placeholder="555-123-4567" {...field} />
+                        <Input placeholder="555-123-4567" {...field} value={field.value ?? ''} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
