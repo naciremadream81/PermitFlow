@@ -145,8 +145,8 @@ export function ContractorManager() {
             <CardHeader>
                 <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle>{contractor.name}</CardTitle>
-                        <CardDescription>{contractor.trade}</CardDescription>
+                        <CardTitle asChild><h3 className="text-2xl font-semibold leading-none tracking-tight">{contractor.name}</h3></CardTitle>
+                        <CardDescription asChild><p className="text-sm text-muted-foreground">{contractor.trade}</p></CardDescription>
                          <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
                             <Award className="h-4 w-4" /> <span>{contractor.licenseNumber}</span>
                         </div>
