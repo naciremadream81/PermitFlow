@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -28,7 +27,8 @@ import {
   Building,
   Wrench,
   DollarSign,
-  DownloadCloud
+  DownloadCloud,
+  Copy,
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
@@ -36,6 +36,8 @@ import { automatePdfPopulation, type AutomatePdfPopulationInput } from '@/ai/flo
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { pdfTemplates } from '@/lib/data';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { Textarea } from './ui/textarea';
 
 interface PermitDetailSheetProps {
   permit: PermitPackage | null;
@@ -55,7 +57,8 @@ const statusColors: { [key: string]: string } = {
 export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage }: PermitDetailSheetProps) {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = React.useState(false);
-  const [generatedPdf, setGeneratedPdf] = React.useState<string | null>(null);
+  const [generatedData, setGeneratedData] = React.useState<Record<string, any> | null>(null);
+  const [isDataDialogOpen, setDataDialogOpen] = React.useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = React.useState<string | undefined>();
   const [attachments, setAttachments] = React.useState<File[]>(permit?.attachments || []);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -64,8 +67,10 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     if (permit) {
       setAttachments(permit.attachments);
     }
-  }, [permit]);
-
+    // Reset generation state when sheet closes or permit changes
+    setGeneratedData(null);
+    setIsGenerating(false);
+  }, [permit, open]);
 
   if (!permit) return null;
 
@@ -109,8 +114,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     toast({ title: 'Success', description: 'Your downloads have started.' });
   }
 
-
-  const handleGeneratePdf = async () => {
+  const handleGenerateData = async () => {
     if (!permit || !selectedTemplateId) {
       toast({ variant: 'destructive', title: 'Error', description: 'Please select a template.' });
       return;
@@ -122,7 +126,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     }
 
     setIsGenerating(true);
-    setGeneratedPdf(null);
+    setGeneratedData(null);
 
     try {
       const input: AutomatePdfPopulationInput = {
@@ -135,18 +139,19 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
 
       const result = await automatePdfPopulation(input);
 
-      if (result.populatedPdfDataUri) {
-        setGeneratedPdf(result.populatedPdfDataUri);
-        toast({ title: 'Success', description: 'PDF has been generated successfully.' });
+      if (result.extractedData) {
+        setGeneratedData(result.extractedData);
+        setDataDialogOpen(true);
+        toast({ title: 'Success', description: 'AI has extracted the form data.' });
       } else {
-        throw new Error('Generation failed, no PDF data returned.');
+        throw new Error('Generation failed, no data returned.');
       }
     } catch (error) {
-      console.error('PDF Generation Error:', error);
+      console.error('Data Generation Error:', error);
       toast({
         variant: 'destructive',
         title: 'Generation Failed',
-        description: 'Could not generate the PDF. Please try again.',
+        description: 'Could not extract data. Please try again.',
       });
     } finally {
       setIsGenerating(false);
@@ -170,116 +175,141 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
   }
 
+  const copyToClipboard = () => {
+    if (generatedData) {
+      navigator.clipboard.writeText(JSON.stringify(generatedData, null, 2));
+      toast({ title: 'Copied!', description: 'Data copied to clipboard.' });
+    }
+  };
+
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col">
-        <SheetHeader>
-          <SheetTitle className="text-2xl">{permit.packageName}</SheetTitle>
-          <SheetDescription className="flex items-center gap-2">
-            ID: {permit.id}
-            <Badge className={statusColors[permit.status]}>{permit.status}</Badge>
-          </SheetDescription>
-        </SheetHeader>
-        <Separator className="my-4" />
+    <>
+      <Sheet open={open} onOpenChange={onOpenChange}>
+        <SheetContent className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col">
+          <SheetHeader>
+            <SheetTitle className="text-2xl">{permit.packageName}</SheetTitle>
+            <SheetDescription className="flex items-center gap-2">
+              ID: {permit.id}
+              <Badge className={statusColors[permit.status]}>{permit.status}</Badge>
+            </SheetDescription>
+          </SheetHeader>
+          <Separator className="my-4" />
 
-        <div className="flex-1 overflow-y-auto pr-6 -mr-6 space-y-6">
-          
-          <div className="space-y-4">
-             <h3 className="text-lg font-semibold">Permit Details</h3>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                <DetailItem icon={Wrench} label="Description of Work">{permit.descriptionOfWork}</DetailItem>
-                <DetailItem icon={Building} label="Use of Building">{permit.buildingUse}</DetailItem>
-                <DetailItem icon={DollarSign} label="Construction Cost">{formatCurrency(permit.constructionCost)}</DetailItem>
-                <DetailItem icon={MapPin} label="Property Address">{permit.property.address.street}, {permit.county}</DetailItem>
-                <DetailItem icon={User} label="Customer">{permit.customer.name}</DetailItem>
-                <DetailItem icon={HardHat} label="Contractor">{permit.contractor.name}</DetailItem>
-                <DetailItem icon={Calendar} label="Created At">{new Date(permit.createdAt).toLocaleDateString()}</DetailItem>
-            </div>
-          </div>
-          
-          <Separator />
-          
-          <div>
-            <h3 className="text-lg font-semibold mb-3">County Checklist</h3>
-            <div className="space-y-3">
-              {permit.checklist.map((item) => (
-                <div key={item.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={item.id}
-                    checked={item.completed}
-                    onCheckedChange={(checked) => handleChecklistChange(item.id, !!checked)}
-                  />
-                  <Label htmlFor={item.id} className={`flex-1 ${item.completed ? 'line-through text-muted-foreground' : ''}`}>{item.text}</Label>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <Separator />
-
-          <div>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold">Attachments</h3>
-              <Button variant="secondary" size="sm" onClick={handleDownloadAll} disabled={attachments.length === 0}>
-                <DownloadCloud className="mr-2 h-4 w-4" />
-                Download All
-              </Button>
-            </div>
-            <div className="space-y-2">
-               {attachments.map((file, index) => (
-                <div key={index} className="flex items-center justify-between p-2 rounded-md border bg-secondary/50">
-                    <div className="flex items-center gap-2">
-                        <Paperclip className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-medium">{file.name}</span>
-                    </div>
-                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeAttachment(file)}>
-                        <X className="h-4 w-4" />
-                    </Button>
-                </div>
-              ))}
-            </div>
-            <Button variant="outline" className="w-full mt-3" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="mr-2 h-4 w-4" />
-              Upload Document
-            </Button>
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
-          </div>
-
-          <Separator />
-
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Generate Documents</h3>
+          <div className="flex-1 overflow-y-auto pr-6 -mr-6 space-y-6">
+            
             <div className="space-y-4">
-              <Select onValueChange={setSelectedTemplateId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a PDF template" />
-                </SelectTrigger>
-                <SelectContent>
-                  {pdfTemplates.map(template => (
-                    <SelectItem key={template.id} value={template.id}>{template.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button onClick={handleGeneratePdf} disabled={isGenerating || !selectedTemplateId} className="w-full">
-                {isGenerating ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : (<FileText className="mr-2 h-4 w-4" />)}
-                {isGenerating ? 'Generating...' : 'Generate PDF'}
+               <h3 className="text-lg font-semibold">Permit Details</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                  <DetailItem icon={Wrench} label="Description of Work">{permit.descriptionOfWork}</DetailItem>
+                  <DetailItem icon={Building} label="Use of Building">{permit.buildingUse}</DetailItem>
+                  <DetailItem icon={DollarSign} label="Construction Cost">{formatCurrency(permit.constructionCost)}</DetailItem>
+                  <DetailItem icon={MapPin} label="Property Address">{permit.property.address.street}, {permit.county}</DetailItem>
+                  <DetailItem icon={User} label="Customer">{permit.customer.name}</DetailItem>
+                  <DetailItem icon={HardHat} label="Contractor">{permit.contractor.name}</DetailItem>
+                  <DetailItem icon={Calendar} label="Created At">{new Date(permit.createdAt).toLocaleDateString()}</DetailItem>
+              </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-3">County Checklist</h3>
+              <div className="space-y-3">
+                {permit.checklist.map((item) => (
+                  <div key={item.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={item.id}
+                      checked={item.completed}
+                      onCheckedChange={(checked) => handleChecklistChange(item.id, !!checked)}
+                    />
+                    <Label htmlFor={item.id} className={`flex-1 ${item.completed ? 'line-through text-muted-foreground' : ''}`}>{item.text}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <Separator />
+
+            <div>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-semibold">Attachments</h3>
+                <Button variant="secondary" size="sm" onClick={handleDownloadAll} disabled={attachments.length === 0}>
+                  <DownloadCloud className="mr-2 h-4 w-4" />
+                  Download All
+                </Button>
+              </div>
+              <div className="space-y-2">
+                 {attachments.map((file, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 rounded-md border bg-secondary/50">
+                      <div className="flex items-center gap-2">
+                          <Paperclip className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">{file.name}</span>
+                      </div>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeAttachment(file)}>
+                          <X className="h-4 w-4" />
+                      </Button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" className="w-full mt-3" onClick={() => fileInputRef.current?.click()}>
+                <Upload className="mr-2 h-4 w-4" />
+                Upload Document
               </Button>
-              {generatedPdf && (
-                <a href={generatedPdf} download={`${permit.customer.name.replace(/\s+/g, '_')}_permit.pdf`} className="block">
-                  <Button variant="outline" className="w-full">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download Generated PDF
-                  </Button>
-                </a>
-              )}
+              <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Generate Document Data</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Select a template and the AI will extract the relevant data from this package, preparing it for form population.
+              </p>
+              <div className="space-y-4">
+                <Select onValueChange={setSelectedTemplateId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a PDF template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pdfTemplates.map(template => (
+                      <SelectItem key={template.id} value={template.id}>{template.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleGenerateData} disabled={isGenerating || !selectedTemplateId} className="w-full">
+                  {isGenerating ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : (<FileText className="mr-2 h-4 w-4" />)}
+                  {isGenerating ? 'Extracting Data...' : 'Extract Data with AI'}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <SheetFooter className="mt-6">
-          <Button onClick={() => onOpenChange(false)}>Close</Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+          <SheetFooter className="mt-6">
+            <Button onClick={() => onOpenChange(false)}>Close</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+      <Dialog open={isDataDialogOpen} onOpenChange={setDataDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>AI Extracted Form Data</DialogTitle>
+            <DialogDescription>
+              Here is the data the AI prepared. You can copy this and use it to manually fill your PDF form.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 relative">
+            <Textarea
+              readOnly
+              value={JSON.stringify(generatedData, null, 2)}
+              className="h-64 font-mono text-xs"
+            />
+            <Button size="icon" variant="ghost" className="absolute top-6 right-2" onClick={copyToClipboard}>
+              <Copy className="h-4 w-4"/>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
