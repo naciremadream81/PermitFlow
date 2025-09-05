@@ -147,6 +147,9 @@ export function ContractorManager() {
                     <div>
                         <CardTitle>{contractor.name}</CardTitle>
                         <CardDescription>{contractor.trade}</CardDescription>
+                         <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
+                            <Award className="h-4 w-4" /> <span>{contractor.licenseNumber}</span>
+                        </div>
                     </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -168,9 +171,6 @@ export function ContractorManager() {
                 </div>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                    <Award className="h-4 w-4" /> <span>{contractor.licenseNumber}</span>
-                </div>
                <div className="flex items-center gap-2 text-muted-foreground">
                     <Mail className="h-4 w-4" /> <span>{contractor.email}</span>
                </div>
