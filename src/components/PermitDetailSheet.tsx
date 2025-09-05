@@ -29,6 +29,7 @@ import {
   DollarSign,
   DownloadCloud,
   Copy,
+  Users,
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
@@ -53,6 +54,13 @@ const statusColors: { [key: string]: string } = {
   Approved: 'bg-green-200 text-green-800',
   Rejected: 'bg-red-200 text-red-800',
 };
+
+// Placeholder data for subcontractors - in a real app, this would come from permit.subcontractors
+const placeholderSubcontractors = [
+    { id: 'sub_001', name: 'PlumbPerfect', trade: 'Plumbing' },
+    { id: 'sub_002', name: 'ElecTech', trade: 'Electrical' },
+    { id: 'sub_003', name: 'CoolBreeze HVAC', trade: 'HVAC' },
+]
 
 export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage }: PermitDetailSheetProps) {
   const { toast } = useToast();
@@ -212,6 +220,25 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
             
             <Separator />
             
+            <div>
+                <h3 className="text-lg font-semibold mb-3">Subcontractors</h3>
+                <div className="space-y-2">
+                    {placeholderSubcontractors.map(sub => (
+                        <div key={sub.id} className="flex items-center justify-between p-2 rounded-md border bg-secondary/50">
+                            <div className="flex items-center gap-2">
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                                <div>
+                                    <p className="text-sm font-medium">{sub.name}</p>
+                                    <p className="text-xs text-muted-foreground">{sub.trade}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <Separator />
+
             <div>
               <h3 className="text-lg font-semibold mb-3">County Checklist</h3>
               <div className="space-y-3">
