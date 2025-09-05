@@ -285,7 +285,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a permit type" />
-                          </Trigger>
+                          </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {permitTypes.map((type) => (
