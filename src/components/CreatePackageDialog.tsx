@@ -19,6 +19,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { floridaCounties, contractors, permitTypes, countyData } from '@/lib/data';
 import type { PermitPackage, Contractor } from '@/lib/types';
 import { PlusCircle } from 'lucide-react';
+import { Textarea } from './ui/textarea';
 
 const packageSchema = z.object({
   packageName: z.string().min(3, 'Package name must be at least 3 characters'),
@@ -28,6 +29,10 @@ const packageSchema = z.object({
   contractorId: z.string().min(1, 'Please select a contractor'),
   permitTypeId: z.string().min(1, 'Please select a permit type'),
   propertyAddress: z.string().min(5, 'Property address is required'),
+  parcelId: z.string().min(1, "Parcel ID is required."),
+  descriptionOfWork: z.string().min(10, 'Please provide a brief description of the work.'),
+  buildingUse: z.string().min(3, 'Building use is required.'),
+  constructionCost: z.coerce.number().min(0, 'Construction cost must be a positive number.'),
 });
 
 type PackageFormValues = z.infer<typeof packageSchema>;
@@ -49,6 +54,10 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
       contractorId: '',
       permitTypeId: '',
       propertyAddress: '',
+      parcelId: '',
+      descriptionOfWork: '',
+      buildingUse: '',
+      constructionCost: 0,
     },
   });
 
@@ -74,18 +83,26 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         id: `cust_${Date.now()}`,
         name: data.customerName,
         email: data.customerEmail,
-        phone: 'N/A',
+        phone: 'N/A', // Placeholder
+        address: { street: '', city: '', state: '', zip: '' }, // Placeholder
       },
       contractor: selectedContractor,
       property: {
         id: `prop_${Date.now()}`,
-        address: data.propertyAddress,
-        city: 'N/A',
-        zip: 'N/A',
+        parcelId: data.parcelId,
+        address: {
+          street: data.propertyAddress,
+          city: 'N/A', // Placeholder
+          state: 'FL', // Placeholder
+          zip: 'N/A', // Placeholder
+        },
       },
       checklist: newChecklist,
       attachments: [],
       createdAt: new Date().toISOString(),
+      descriptionOfWork: data.descriptionOfWork,
+      buildingUse: data.buildingUse,
+      constructionCost: data.constructionCost,
     };
     onPackageCreate(newPackage);
     onOpenChange(false);
@@ -94,13 +111,13 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Create New Permit Package</DialogTitle>
           <DialogDescription>Fill in the details below to create a new permit package.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[80vh] overflow-y-auto pr-4">
             <FormField
               control={form.control}
               name="packageName"
@@ -114,55 +131,130 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="descriptionOfWork"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description of Work</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Describe the work to be done..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
+               <FormField
                 control={form.control}
-                name="county"
+                name="buildingUse"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>County</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a county" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {floridaCounties.map((county) => (
-                          <SelectItem key={county} value={county}>
-                            {county}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Building Use</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Single Family Residential" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
+               <FormField
                 control={form.control}
-                name="permitTypeId"
+                name="constructionCost"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Permit Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a permit type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {permitTypes.map((type) => (
-                          <SelectItem key={type.id} value={type.id}>
-                            {type.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Construction Cost</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="150000" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground">Location & Type</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
+                <FormField
+                  control={form.control}
+                  name="county"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>County</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a county" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {floridaCounties.map((county) => (
+                            <SelectItem key={county} value={county}>
+                              {county}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="permitTypeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Permit Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a permit type" />
+                          </Trigger>
+                        </FormControl>
+                        <SelectContent>
+                          {permitTypes.map((type) => (
+                            <SelectItem key={type.id} value={type.id}>
+                              {type.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-muted-foreground">Property Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
+                <FormField
+                  control={form.control}
+                  name="propertyAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Property Address (Street)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="123 Main St" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="parcelId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Parcel ID</FormLabel>
+                      <FormControl>
+                        <Input placeholder="01-2345-000-0000" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <h3 className="text-sm font-medium text-muted-foreground">Customer Details</h3>
@@ -196,14 +288,14 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
               </div>
             </div>
             <div className="space-y-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Contractor & Property</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
+              <h3 className="text-sm font-medium text-muted-foreground">Contractor</h3>
+               <div className="rounded-lg border p-4">
                 <FormField
                   control={form.control}
                   name="contractorId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contractor</FormLabel>
+                      <FormLabel>Select Contractor</FormLabel>
                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
@@ -218,19 +310,6 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="propertyAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Property Address</FormLabel>
-                      <FormControl>
-                        <Input placeholder="123 Main St, Anytown, FL" {...field} />
-                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

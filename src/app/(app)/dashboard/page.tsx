@@ -110,6 +110,7 @@ export default function DashboardPage() {
                   <p><span className="font-medium text-muted-foreground">Customer:</span> {pkg.customer.name}</p>
                   <p><span className="font-medium text-muted-foreground">Contractor:</span> {pkg.contractor.name}</p>
                   <p><span className="font-medium text-muted-foreground">County:</span> {pkg.county}</p>
+                  <p><span className="font-medium text-muted-foreground">Work:</span> {pkg.descriptionOfWork}</p>
                 </div>
               </CardContent>
               <CardFooter>

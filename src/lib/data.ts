@@ -1,18 +1,20 @@
 import type { PermitPackage, County, Customer, Contractor, Property, PDFTemplate, PermitType } from './types';
 
+const floridaAddress = { street: '123 Sunshine State St', city: 'Miami', state: 'FL', zip: '33101' };
+
 export const customers: Customer[] = [
-  { id: 'cust_001', name: 'John Doe', email: 'john.doe@email.com', phone: '555-1234' },
-  { id: 'cust_002', name: 'Jane Smith', email: 'jane.smith@email.com', phone: '555-5678' },
+  { id: 'cust_001', name: 'John Doe', email: 'john.doe@email.com', phone: '555-1234', address: floridaAddress },
+  { id: 'cust_002', name: 'Jane Smith', email: 'jane.smith@email.com', phone: '555-5678', address: floridaAddress },
 ];
 
 export const contractors: Contractor[] = [
-  { id: 'cont_001', name: 'BuildRight Inc.', licenseNumber: 'CGC123456', email: 'contact@buildright.com', phone: '555-8765' },
-  { id: 'cont_002', name: 'Quality Homes LLC', licenseNumber: 'CGC789012', email: 'info@qualityhomes.com', phone: '555-4321' },
+  { id: 'cont_001', name: 'BuildRight Inc.', licenseNumber: 'CGC123456', email: 'contact@buildright.com', phone: '555-8765', address: floridaAddress },
+  { id: 'cont_002', name: 'Quality Homes LLC', licenseNumber: 'CGC789012', email: 'info@qualityhomes.com', phone: '555-4321', address: floridaAddress },
 ];
 
 export const properties: Property[] = [
-  { id: 'prop_001', address: '123 Main St', city: 'Miami', zip: '33101' },
-  { id: 'prop_002', address: '456 Oak Ave', city: 'Orlando', zip: '32801' },
+  { id: 'prop_001', address: { street: '123 Main St', city: 'Miami', state: 'FL', zip: '33101' }, parcelId: '01-2345-000-0000' },
+  { id: 'prop_002', address: { street: '456 Oak Ave', city: 'Orlando', state: 'FL', zip: '32801' }, parcelId: '02-3456-000-0000' },
 ];
 
 export const floridaCounties: string[] = [
@@ -121,6 +123,9 @@ export const permitPackages: PermitPackage[] = [
     checklist: countyData.find(c => c.name === 'Miami-Dade')?.checklist || [],
     attachments: [],
     createdAt: '2024-07-28T10:00:00Z',
+    descriptionOfWork: 'New single family home construction',
+    buildingUse: 'Single Family Residential',
+    constructionCost: 350000,
   },
   {
     id: 'PKG-2024-002',
@@ -133,6 +138,9 @@ export const permitPackages: PermitPackage[] = [
     checklist: countyData.find(c => c.name === 'Orange')?.checklist || [],
     attachments: [],
     createdAt: '2024-07-29T14:30:00Z',
+    descriptionOfWork: 'Installation of a new modular home on existing lot.',
+    buildingUse: 'Modular Home',
+    constructionCost: 150000,
   },
     {
     id: 'PKG-2024-003',
@@ -141,10 +149,13 @@ export const permitPackages: PermitPackage[] = [
     county: 'Polk',
     customer: customers[0],
     contractor: contractors[1],
-    property: { id: 'prop_003', address: '789 Lake Rd', city: 'Lakeland', zip: '33801' },
+    property: { id: 'prop_003', parcelId: '03-4567-000-0000', address: { street: '789 Lake Rd', city: 'Lakeland', state: 'FL', zip: '33801' } },
     checklist: countyData.find(c => c.name === 'Polk')?.checklist || [],
     attachments: [],
     createdAt: '2024-07-30T09:00:00Z',
+    descriptionOfWork: 'Site prep and setup for a new manufactured home.',
+    buildingUse: 'Manufactured Home',
+    constructionCost: 85000,
   },
 ];
 

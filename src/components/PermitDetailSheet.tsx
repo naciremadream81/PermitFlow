@@ -24,6 +24,9 @@ import {
   Loader2,
   Download,
   X,
+  Building,
+  Wrench,
+  DollarSign
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
@@ -141,6 +144,11 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
       </div>
     </div>
   );
+  
+  const formatCurrency = (amount?: number) => {
+    if (typeof amount !== 'number') return 'N/A';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -155,11 +163,18 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
         <Separator className="my-4" />
 
         <div className="flex-1 overflow-y-auto pr-6 -mr-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DetailItem icon={User} label="Customer">{permit.customer.name}</DetailItem>
-            <DetailItem icon={HardHat} label="Contractor">{permit.contractor.name}</DetailItem>
-            <DetailItem icon={MapPin} label="Property">{permit.property.address}, {permit.county}</DetailItem>
-            <DetailItem icon={Calendar} label="Created At">{new Date(permit.createdAt).toLocaleDateString()}</DetailItem>
+          
+          <div className="space-y-4">
+             <h3 className="text-lg font-semibold">Permit Details</h3>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <DetailItem icon={Wrench} label="Description of Work">{permit.descriptionOfWork}</DetailItem>
+                <DetailItem icon={Building} label="Use of Building">{permit.buildingUse}</DetailItem>
+                <DetailItem icon={DollarSign} label="Construction Cost">{formatCurrency(permit.constructionCost)}</DetailItem>
+                <DetailItem icon={MapPin} label="Property Address">{permit.property.address.street}, {permit.county}</DetailItem>
+                <DetailItem icon={User} label="Customer">{permit.customer.name}</DetailItem>
+                <DetailItem icon={HardHat} label="Contractor">{permit.contractor.name}</DetailItem>
+                <DetailItem icon={Calendar} label="Created At">{new Date(permit.createdAt).toLocaleDateString()}</DetailItem>
+            </div>
           </div>
           
           <Separator />

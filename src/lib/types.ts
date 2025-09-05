@@ -1,25 +1,36 @@
 export type Status = 'Draft' | 'In Progress' | 'Submitted' | 'Approved' | 'Rejected';
 
+export type Address = {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+
 export type Customer = {
   id: string;
   name: string;
   email: string;
   phone: string;
+  address: Address;
 };
 
 export type Contractor = {
-  id:string;
+  id: string;
   name: string;
   licenseNumber: string;
   email: string;
   phone: string;
+  fax?: string;
+  address: Address;
 };
 
 export type Property = {
   id: string;
-  address: string;
-  city: string;
-  zip: string;
+  parcelId: string;
+  address: Address;
+  unit?: string;
+  building?: string;
 };
 
 export type ChecklistItem = {
@@ -44,6 +55,15 @@ export type PermitPackage = {
   checklist: ChecklistItem[];
   attachments: File[];
   createdAt: string;
+  // New fields from permit application
+  descriptionOfWork: string;
+  buildingUse: string;
+  constructionCost: number;
+  acTons?: number;
+  heatKw?: number;
+  septicPermitOrSewerCompany?: string;
+  electricalServiceAmps?: number;
+  waterServiceSource?: string;
 };
 
 export type PDFTemplate = {
