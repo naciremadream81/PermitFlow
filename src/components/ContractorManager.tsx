@@ -39,7 +39,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
 
 const contractorSchema = z.object({
-    name: z.string().min(2, 'Contractor name is required'),
+    name: z.string().min(2, 'Company name is required'),
     trade: z.string().min(2, 'Trade is required'),
     licenseNumber: z.string().min(1, 'License number is required'),
     email: z.string().email('Invalid email address'),
@@ -202,7 +202,7 @@ export function ContractorManager() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="name" render={({ field }) => (
-                        <FormItem><FormLabel>Contractor Name</FormLabel><FormControl><Input placeholder="BuildRight Inc." {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>Company Name</FormLabel><FormControl><Input placeholder="BuildRight Inc." {...field} /></FormControl><FormMessage /></FormItem>
                     )}/>
                     <FormField control={form.control} name="trade" render={({ field }) => (
                         <FormItem><FormLabel>Trade</FormLabel><FormControl><Input placeholder="General Contractor" {...field} /></FormControl><FormMessage /></FormItem>
