@@ -52,3 +52,9 @@ export type PDFTemplate = {
   description: string;
   dataUri: string;
 };
+
+export type PermitType = {
+  id: string;
+  name: string;
+  checklist: Omit<ChecklistItem, 'id' | 'completed'>[];
+};

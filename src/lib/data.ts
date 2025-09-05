@@ -1,4 +1,4 @@
-import type { PermitPackage, County, Customer, Contractor, Property, PDFTemplate } from './types';
+import type { PermitPackage, County, Customer, Contractor, Property, PDFTemplate, PermitType } from './types';
 
 export const customers: Customer[] = [
   { id: 'cust_001', name: 'John Doe', email: 'john.doe@email.com', phone: '555-1234' },
@@ -37,6 +37,44 @@ export const countyData: County[] = floridaCounties.map(name => ({
   name,
   checklist: defaultChecklist.map(item => ({...item, id: `${name.toLowerCase().replace(/\s/g, '-')}_${item.id}`}))
 }));
+
+export const permitTypes: PermitType[] = [
+    {
+        id: 'pt_new_build',
+        name: 'New Single Family Home',
+        checklist: [
+            { text: 'Foundation Plans' },
+            { text: 'Framing Plans' },
+            { text: 'Electrical Plans' },
+            { text: 'Plumbing Plans' },
+            { text: 'Mechanical Plans (HVAC)' },
+            { text: 'Roofing Details' },
+            { text: 'Energy Code Compliance Forms' },
+        ],
+    },
+    {
+        id: 'pt_modular',
+        name: 'Modular/Manufactured Home',
+        checklist: [
+            { text: 'Manufacturer\'s Installation Manual' },
+            { text: 'Foundation/Anchoring Details' },
+            { text: 'Utility Connection Plans (Sewer, Water, Electric)' },
+            { text: 'Site Plan' },
+            { text: 'Transportation Permit' },
+        ],
+    },
+    {
+        id: 'pt_remodel',
+        name: 'Major Remodel / Addition',
+        checklist: [
+            { text: 'As-Built Drawings of Existing Structure' },
+            { text: 'Demolition Plans' },
+            { text: 'Proposed Floor Plans' },
+            { text: 'Structural Modifications Details' },
+            { text: 'Electrical/Plumbing Updates' },
+        ],
+    },
+];
 
 
 export const permitPackages: PermitPackage[] = [

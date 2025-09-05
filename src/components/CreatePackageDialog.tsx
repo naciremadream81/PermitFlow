@@ -16,8 +16,8 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { floridaCounties } from '@/lib/data';
-import type { PermitPackage } from '@/lib/types';
+import { floridaCounties, contractors, permitTypes, countyData } from '@/lib/data';
+import type { PermitPackage, Contractor } from '@/lib/types';
 import { PlusCircle } from 'lucide-react';
 
 const packageSchema = z.object({
@@ -25,7 +25,8 @@ const packageSchema = z.object({
   county: z.string().min(1, 'Please select a county'),
   customerName: z.string().min(2, 'Customer name is required'),
   customerEmail: z.string().email('Invalid email address'),
-  contractorName: z.string().min(2, 'Contractor name is required'),
+  contractorId: z.string().min(1, 'Please select a contractor'),
+  permitTypeId: z.string().min(1, 'Please select a permit type'),
   propertyAddress: z.string().min(5, 'Property address is required'),
 });
 
@@ -45,12 +46,25 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
       county: '',
       customerName: '',
       customerEmail: '',
-      contractorName: '',
+      contractorId: '',
+      permitTypeId: '',
       propertyAddress: '',
     },
   });
 
   function onSubmit(data: PackageFormValues) {
+    const selectedContractor = contractors.find(c => c.id === data.contractorId) as Contractor;
+    const selectedPermitType = permitTypes.find(pt => pt.id === data.permitTypeId);
+    const countyChecklist = countyData.find(c => c.name === data.county)?.checklist || [];
+    
+    const newChecklist = selectedPermitType
+      ? selectedPermitType.checklist.map((item, index) => ({
+          id: `new_${data.county}_${selectedPermitType.id}_${index}`,
+          text: item.text,
+          completed: false,
+        }))
+      : countyChecklist;
+
     const newPackage: PermitPackage = {
       id: `PKG-${Date.now()}`,
       packageName: data.packageName,
@@ -62,20 +76,14 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         email: data.customerEmail,
         phone: 'N/A',
       },
-      contractor: {
-        id: `cont_${Date.now()}`,
-        name: data.contractorName,
-        licenseNumber: 'N/A',
-        email: 'N/A',
-        phone: 'N/A',
-      },
+      contractor: selectedContractor,
       property: {
         id: `prop_${Date.now()}`,
         address: data.propertyAddress,
         city: 'N/A',
         zip: 'N/A',
       },
-      checklist: [],
+      checklist: newChecklist,
       attachments: [],
       createdAt: new Date().toISOString(),
     };
@@ -93,20 +101,20 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <FormField
+              control={form.control}
+              name="packageName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Package Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Smith Residence - New Modular" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="packageName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Package Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Smith Residence - New Modular" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="county"
@@ -123,6 +131,30 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
                         {floridaCounties.map((county) => (
                           <SelectItem key={county} value={county}>
                             {county}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="permitTypeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Permit Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a permit type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {permitTypes.map((type) => (
+                          <SelectItem key={type.id} value={type.id}>
+                            {type.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -168,13 +200,24 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
                 <FormField
                   control={form.control}
-                  name="contractorName"
+                  name="contractorId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Contractor Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="BuildRight Inc." {...field} />
-                      </FormControl>
+                      <FormLabel>Contractor</FormLabel>
+                       <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a contractor" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {contractors.map((contractor) => (
+                            <SelectItem key={contractor.id} value={contractor.id}>
+                              {contractor.name} ({contractor.licenseNumber})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
