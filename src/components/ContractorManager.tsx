@@ -14,7 +14,7 @@ import {
   CardFooter,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Edit, Trash2, Phone, Mail, FileText, MoreVertical } from 'lucide-react';
+import { PlusCircle, Edit, Trash2, Phone, Mail, FileText, MoreVertical, Award } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 const contractorSchema = z.object({
     name: z.string().min(2, 'Contractor name is required'),
+    trade: z.string().min(2, 'Trade is required'),
     licenseNumber: z.string().min(1, 'License number is required'),
     email: z.string().email('Invalid email address'),
     phone: z.string().min(1, 'Phone number is required'),
@@ -68,6 +69,7 @@ export function ContractorManager() {
     setEditingContractor(contractor);
     form.reset({
         name: contractor.name,
+        trade: contractor.trade,
         licenseNumber: contractor.licenseNumber,
         email: contractor.email,
         phone: contractor.phone,
@@ -86,6 +88,7 @@ export function ContractorManager() {
     setEditingContractor(null);
     form.reset({
         name: '',
+        trade: '',
         licenseNumber: '',
         email: '',
         phone: '',
@@ -141,7 +144,10 @@ export function ContractorManager() {
           <Card key={contractor.id}>
             <CardHeader>
                 <div className="flex items-start justify-between">
-                    <CardTitle>{contractor.name}</CardTitle>
+                    <div>
+                        <CardTitle>{contractor.name}</CardTitle>
+                        <CardDescription>{contractor.trade}</CardDescription>
+                    </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -160,9 +166,11 @@ export function ContractorManager() {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-              <CardDescription>License: {contractor.licenseNumber}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                    <Award className="h-4 w-4" /> <span>{contractor.licenseNumber}</span>
+                </div>
                <div className="flex items-center gap-2 text-muted-foreground">
                     <Mail className="h-4 w-4" /> <span>{contractor.email}</span>
                </div>
@@ -192,9 +200,14 @@ export function ContractorManager() {
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
-                <FormField control={form.control} name="name" render={({ field }) => (
-                    <FormItem><FormLabel>Contractor Name</FormLabel><FormControl><Input placeholder="BuildRight Inc." {...field} /></FormControl><FormMessage /></FormItem>
-                )}/>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="name" render={({ field }) => (
+                        <FormItem><FormLabel>Contractor Name</FormLabel><FormControl><Input placeholder="BuildRight Inc." {...field} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="trade" render={({ field }) => (
+                        <FormItem><FormLabel>Trade</FormLabel><FormControl><Input placeholder="General Contractor" {...field} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                </div>
                 <FormField control={form.control} name="licenseNumber" render={({ field }) => (
                     <FormItem><FormLabel>License Number</FormLabel><FormControl><Input placeholder="CGC123456" {...field} /></FormControl><FormMessage /></FormItem>
                 )}/>

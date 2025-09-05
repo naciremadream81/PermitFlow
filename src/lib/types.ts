@@ -19,6 +19,7 @@ export type Contractor = {
   id: string;
   name: string;
   licenseNumber: string;
+  trade: string;
   email: string;
   phone: string;
   fax?: string;

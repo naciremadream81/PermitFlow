@@ -8,8 +8,8 @@ export const customers: Customer[] = [
 ];
 
 export const contractors: Contractor[] = [
-  { id: 'cont_001', name: 'BuildRight Inc.', licenseNumber: 'CGC123456', email: 'contact@buildright.com', phone: '555-8765', address: floridaAddress },
-  { id: 'cont_002', name: 'Quality Homes LLC', licenseNumber: 'CGC789012', email: 'info@qualityhomes.com', phone: '555-4321', address: floridaAddress },
+  { id: 'cont_001', name: 'BuildRight Inc.', trade: 'General Contractor', licenseNumber: 'CGC123456', email: 'contact@buildright.com', phone: '555-8765', address: floridaAddress },
+  { id: 'cont_002', name: 'Quality Homes LLC', trade: 'Residential Contractor', licenseNumber: 'CGC789012', email: 'info@qualityhomes.com', phone: '555-4321', address: floridaAddress },
 ];
 
 export const properties: Property[] = [
