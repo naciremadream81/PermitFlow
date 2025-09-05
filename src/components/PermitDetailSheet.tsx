@@ -166,14 +166,14 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     }
   };
 
-  const DetailItem = ({ icon, label, children }: { icon: React.ElementType; label: string; children: React.ReactNode }) => (
-    <div className="flex items-start gap-3">
+  const DetailItem = ({ icon, label, children, className }: { icon: React.ElementType; label: string; children: React.ReactNode; className?: string }) => (
+    <div className={cn("flex items-start gap-3", className)}>
       <div className="text-muted-foreground mt-1">
         {React.createElement(icon, { className: 'h-5 w-5' })}
       </div>
       <div>
         <p className="text-sm font-medium text-muted-foreground">{label}</p>
-        <p className="text-base font-semibold">{children}</p>
+        <div className="text-base font-semibold">{children}</div>
       </div>
     </div>
   );
@@ -214,31 +214,24 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
                   <DetailItem icon={MapPin} label="Property Address">{permit.property.address.street}, {permit.county}</DetailItem>
                   <DetailItem icon={User} label="Customer">{permit.customer.name}</DetailItem>
                   <DetailItem icon={HardHat} label="Contractor">{permit.contractor.name}</DetailItem>
-                  <DetailItem icon={Calendar} label="Created At">{new Date(permit.createdAt).toLocaleDateString()}</DetailItem>
+                  
+                  <DetailItem icon={Users} label="Subcontractors" className="md:col-span-2">
+                    <div className="mt-1 space-y-1 text-sm font-normal">
+                      {placeholderSubcontractors.map(sub => (
+                          <div key={sub.id} className="flex items-center justify-between p-1.5 rounded-md border bg-secondary/50">
+                              <p className="font-medium">{sub.name}</p>
+                              <p className="text-xs text-muted-foreground">{sub.trade}</p>
+                          </div>
+                      ))}
+                    </div>
+                  </DetailItem>
+                  
+                   <DetailItem icon={Calendar} label="Created At">{new Date(permit.createdAt).toLocaleDateString()}</DetailItem>
               </div>
             </div>
             
             <Separator />
             
-            <div>
-                <h3 className="text-lg font-semibold mb-3">Subcontractors</h3>
-                <div className="space-y-2">
-                    {placeholderSubcontractors.map(sub => (
-                        <div key={sub.id} className="flex items-center justify-between p-2 rounded-md border bg-secondary/50">
-                            <div className="flex items-center gap-2">
-                                <Users className="h-4 w-4 text-muted-foreground" />
-                                <div>
-                                    <p className="text-sm font-medium">{sub.name}</p>
-                                    <p className="text-xs text-muted-foreground">{sub.trade}</p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            <Separator />
-
             <div>
               <h3 className="text-lg font-semibold mb-3">County Checklist</h3>
               <div className="space-y-3">
