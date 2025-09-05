@@ -109,6 +109,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         address: { street: '', city: '', state: '', zip: '' }, // Placeholder
       },
       contractor: selectedContractor,
+      subcontractors: [],
       property: {
         id: `prop_${Date.now()}`,
         parcelId: data.parcelId,

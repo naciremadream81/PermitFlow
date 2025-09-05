@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import type { PermitPackage, PDFTemplate } from '@/lib/types';
+import type { PermitPackage, PDFTemplate, Contractor } from '@/lib/types';
 import {
   FileText,
   User,
@@ -30,16 +30,19 @@ import {
   DownloadCloud,
   Copy,
   Users,
+  PlusCircle,
+  Trash2,
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
 import { automatePdfPopulation, type AutomatePdfPopulationInput } from '@/ai/flows/automate-pdf-population';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { pdfTemplates } from '@/lib/data';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { pdfTemplates, contractors as allContractors } from '@/lib/data';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import { Textarea } from './ui/textarea';
 import { cn } from '@/lib/utils';
+import useLocalStorage from '@/hooks/use-local-storage';
 
 interface PermitDetailSheetProps {
   permit: PermitPackage | null;
@@ -56,21 +59,94 @@ const statusColors: { [key: string]: string } = {
   Rejected: 'bg-red-200 text-red-800',
 };
 
-// Placeholder data for subcontractors - in a real app, this would come from permit.subcontractors
-const placeholderSubcontractors = [
-    { id: 'sub_001', name: 'PlumbPerfect', trade: 'Plumbing' },
-    { id: 'sub_002', name: 'ElecTech', trade: 'Electrical' },
-    { id: 'sub_003', name: 'CoolBreeze HVAC', trade: 'HVAC' },
-]
+const ManageSubcontractorsDialog = ({
+  permit,
+  onUpdatePackage,
+  open,
+  onOpenChange
+}: { permit: PermitPackage, onUpdatePackage: (pkg: PermitPackage) => void, open: boolean, onOpenChange: (open: boolean) => void }) => {
+  const [contractors] = useLocalStorage<Contractor[]>('contractors', allContractors);
+  const [selectedSub, setSelectedSub] = React.useState('');
+
+  const currentSubs = permit.subcontractors || [];
+  const availableContractors = contractors.filter(c => 
+    c.id !== permit.contractor.id && !currentSubs.some(sub => sub.id === c.id)
+  );
+
+  const handleAdd = () => {
+    const contractorToAdd = contractors.find(c => c.id === selectedSub);
+    if(contractorToAdd) {
+      const updatedSubs = [...currentSubs, contractorToAdd];
+      onUpdatePackage({ ...permit, subcontractors: updatedSubs });
+      setSelectedSub('');
+    }
+  }
+
+  const handleRemove = (subId: string) => {
+    const updatedSubs = currentSubs.filter(sub => sub.id !== subId);
+    onUpdatePackage({ ...permit, subcontractors: updatedSubs });
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Manage Subcontractors for {permit.packageName}</DialogTitle>
+          <DialogDescription>Add or remove subcontractors from this permit package.</DialogDescription>
+        </DialogHeader>
+        <div className="py-4 space-y-4">
+          <div className="space-y-2">
+            <h4 className="font-medium">Current Subcontractors</h4>
+            <div className="space-y-2">
+              {currentSubs.length > 0 ? currentSubs.map(sub => (
+                <div key={sub.id} className="flex items-center justify-between p-2 rounded-md border bg-secondary/50">
+                  <div>
+                    <p className="font-medium">{sub.name}</p>
+                    <p className="text-xs text-muted-foreground">{sub.trade}</p>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleRemove(sub.id)}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )) : <p className="text-sm text-muted-foreground">No subcontractors assigned.</p>}
+            </div>
+          </div>
+          <Separator />
+          <div className="space-y-2">
+            <h4 className="font-medium">Add a Subcontractor</h4>
+            <div className="flex gap-2">
+              <Select onValueChange={setSelectedSub} value={selectedSub}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a contractor" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableContractors.map(c => <SelectItem key={c.id} value={c.id}>{c.name} ({c.trade})</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Button onClick={handleAdd} disabled={!selectedSub}>
+                <PlusCircle className="h-4 w-4" /> Add
+              </Button>
+            </div>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage }: PermitDetailSheetProps) {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [generatedData, setGeneratedData] = React.useState<Record<string, any> | null>(null);
   const [isDataDialogOpen, setDataDialogOpen] = React.useState(false);
+  const [isSubcontractorDialogOpen, setSubcontractorDialogOpen] = React.useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = React.useState<string | undefined>();
   const [attachments, setAttachments] = React.useState<File[]>(permit?.attachments || []);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  
 
   React.useEffect(() => {
     if (permit) {
@@ -220,12 +296,19 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
                   
                   <DetailItem icon={Users} label="Subcontractors" className="md:col-span-2">
                     <div className="mt-1 space-y-1 text-sm font-normal">
-                      {placeholderSubcontractors.map(sub => (
+                      {(permit.subcontractors && permit.subcontractors.length > 0) ? (
+                        permit.subcontractors.map(sub => (
                           <div key={sub.id} className="flex items-center justify-between p-1.5 rounded-md border bg-secondary/50">
                               <p className="font-medium">{sub.name}</p>
                               <p className="text-xs text-muted-foreground">{sub.trade}</p>
                           </div>
-                      ))}
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground">No subcontractors assigned.</p>
+                      )}
+                      <Button variant="outline" size="sm" className="mt-2" onClick={() => setSubcontractorDialogOpen(true)}>
+                        Manage Subcontractors
+                      </Button>
                     </div>
                   </DetailItem>
                   
@@ -333,6 +416,13 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
           </div>
         </DialogContent>
       </Dialog>
+      
+      {permit && <ManageSubcontractorsDialog 
+        permit={permit} 
+        onUpdatePackage={onUpdatePackage}
+        open={isSubcontractorDialogOpen}
+        onOpenChange={setSubcontractorDialogOpen}
+      />}
     </>
   );
 }

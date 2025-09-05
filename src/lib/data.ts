@@ -10,6 +10,9 @@ export const customers: Customer[] = [
 export const contractors: Contractor[] = [
   { id: 'cont_001', name: 'BuildRight Inc.', trade: 'General Contractor', licenseNumber: 'CGC123456', email: 'contact@buildright.com', phone: '555-8765', address: floridaAddress },
   { id: 'cont_002', name: 'Quality Homes LLC', trade: 'Residential Contractor', licenseNumber: 'CGC789012', email: 'info@qualityhomes.com', phone: '555-4321', address: floridaAddress },
+  { id: 'cont_003', name: 'PlumbPerfect', trade: 'Plumbing', licenseNumber: 'CFC1425899', email: 'service@plumbperfect.com', phone: '555-9999', address: floridaAddress },
+  { id: 'cont_004', name: 'ElecTech', trade: 'Electrical', licenseNumber: 'EC13005138', email: 'contact@electech.com', phone: '555-8888', address: floridaAddress },
+  { id: 'cont_005', name: 'CoolBreeze HVAC', trade: 'HVAC', licenseNumber: 'CAC1813642', email: 'support@coolbreeze.com', phone: '555-7777', address: floridaAddress },
 ];
 
 export const properties: Property[] = [
@@ -119,6 +122,7 @@ export const permitPackages: PermitPackage[] = [
     county: 'Miami-Dade',
     customer: customers[0],
     contractor: contractors[0],
+    subcontractors: [contractors[2], contractors[3], contractors[4]],
     property: properties[0],
     checklist: countyData.find(c => c.name === 'Miami-Dade')?.checklist || [],
     attachments: [],
@@ -134,6 +138,7 @@ export const permitPackages: PermitPackage[] = [
     county: 'Orange',
     customer: customers[1],
     contractor: contractors[1],
+    subcontractors: [],
     property: properties[1],
     checklist: countyData.find(c => c.name === 'Orange')?.checklist || [],
     attachments: [],
@@ -149,6 +154,7 @@ export const permitPackages: PermitPackage[] = [
     county: 'Polk',
     customer: customers[0],
     contractor: contractors[1],
+    subcontractors: [],
     property: { id: 'prop_003', parcelId: '03-4567-000-0000', address: { street: '789 Lake Rd', city: 'Lakeland', state: 'FL', zip: '33801' } },
     checklist: countyData.find(c => c.name === 'Polk')?.checklist || [],
     attachments: [],

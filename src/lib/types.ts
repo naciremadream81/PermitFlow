@@ -52,6 +52,7 @@ export type PermitPackage = {
   county: string;
   customer: Customer;
   contractor: Contractor;
+  subcontractors?: Contractor[];
   property: Property;
   checklist: ChecklistItem[];
   attachments: File[];
