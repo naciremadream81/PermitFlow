@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -17,6 +18,7 @@ import { LayoutDashboard, FileText, CheckSquare, Settings, LogOut } from 'lucide
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Link from 'next/link';
 
 function AppLogo() {
   return (
@@ -43,22 +45,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarContent className="p-2">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/dashboard" isActive={pathname.startsWith('/dashboard')} tooltip="Dashboard">
-                <LayoutDashboard />
-                Dashboard
-              </SidebarMenuButton>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard')} tooltip="Dashboard">
+                    <Link href="/dashboard">
+                        <LayoutDashboard />
+                        Dashboard
+                    </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/templates" isActive={pathname.startsWith('/templates')} tooltip="Templates">
-                <FileText />
-                PDF Templates
-              </SidebarMenuButton>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/templates')} tooltip="Templates">
+                    <Link href="/templates">
+                        <FileText />
+                        PDF Templates
+                    </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/checklists" isActive={pathname.startsWith('/checklists')} tooltip="Checklists">
-                <CheckSquare />
-                County Checklists
-              </SidebarMenuButton>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/checklists')} tooltip="Checklists">
+                    <Link href="/checklists">
+                        <CheckSquare />
+                        County Checklists
+                    </Link>
+                </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarContent>
