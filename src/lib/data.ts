@@ -1,3 +1,4 @@
+
 import type { PermitPackage, County, Customer, Contractor, Property, PDFTemplate, PermitType } from './types';
 
 const floridaAddress = { street: '123 Sunshine State St', city: 'Miami', state: 'FL', zip: '33101' };
@@ -84,19 +85,18 @@ export const permitTypes: PermitType[] = [
         checklist: [
             { text: 'Application for Construction Permit' },
             { text: 'Tree Permit Application Package' },
-            { text: 'Notice of Commencement (if contract > $5,000)' },
-            { text: 'Proof of Florida DBPR approval' },
-            { text: 'Signed and sealed foundation drawings/plans' },
-            { text: 'Elevation Certificate (Final, if in SFHA)' },
-            { text: 'Drainage/Site Plan' },
+            { text: 'Notice of Commencement (1 copy signed and recorded): Any improvement for which the direct contract price is greater than $5,000. Must be submitted prior to scheduling the first inspection.' },
+            { text: 'Drawings/Plans/Engineering: Proof of Florida DBPR approval. Must convey the full extent of proposed work – legible and of sufficient clarity. Foundation drawings/plans need to be signed and sealed. If applying for a permit in person, plans must be wet or embossed with a signature. If applying for a permit online, plans must be digitally signed and sealed with a third-party verification.' },
+            { text: 'Elevation Certificate (Final): Prepared by a registered surveyor, is required if the property is within the Special Flood Hazard Area. The certificate must be submitted for approval prior to requesting any final inspections. The document may be emailed to FloodInfo@CharlotteCountyFL.gov.' },
+            { text: 'Drainage/Site Plan: Showing the proposed structure(s), setbacks from the structure to the property lines, seawall, or mean highwater line to the structure, any easements on the property, street names, and existing and proposed ground elevations adjacent to the building, the property lines, and property corners (minimum), as well as the proposed final elevations of the different floor areas. Include one site plan for right-of-way (ROW) review showing proposed driveway.' },
             { text: 'Survey' },
-            { text: 'Drainage Survey (As Built)' },
+            { text: 'Drainage Survey (As Built): Prepared, signed and sealed by a registered surveyor indicating post-construction elevations. The plan must be submitted for approval prior to requesting any final inspections.' },
             { text: 'Tree Permit Application Package (if removing trees)' },
-            { text: 'CCU Application or FDOH Septic Permit' },
+            { text: 'CCU or State of Florida Department of Health (FDOH): Either a Charlotte County Utilities (CCU) application, an approved septic permit from the FDOH, or a letter from the utility company that provides service to that location' },
             { text: 'No Public Utility Structures On-Site Affidavit' },
             { text: 'Fire Hydrant Accessibility/Location Affidavit' },
             { text: 'Public Sewer, Private Septic & Water Service Affidavit' },
-            { text: 'Subcontractor Worksheet' },
+            { text: 'Subcontractor Worksheet: Required if contractor is hiring a subcontractor to perform any electric, mechanical, or plumbing' },
             { text: 'Owner-Builder Disclosure Statement Form (if applicable)' },
         ],
     },
@@ -146,6 +146,7 @@ export const permitPackages: PermitPackage[] = [
     descriptionOfWork: 'Installation of a new modular home on existing lot.',
     buildingUse: 'Modular Home',
     constructionCost: 150000,
+    parcelId: '123-456-789'
   },
     {
     id: 'PKG-2024-003',
@@ -162,6 +163,7 @@ export const permitPackages: PermitPackage[] = [
     descriptionOfWork: 'Site prep and setup for a new manufactured home.',
     buildingUse: 'Manufactured Home',
     constructionCost: 85000,
+    parcelId: '987-654-321'
   },
 ];
 
@@ -179,3 +181,5 @@ export const pdfTemplates: PDFTemplate[] = [
         dataUri: 'data:application/pdf;base64,JVBERi0xLjQKJSAg...JUI1NvbW1lbmNlbWVudC4pIFRqCkVNCmVuZHN0cmVhbQplbmRvYmoKCjYgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCnhyZWYKMCA3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMDYxIDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAwMDAwMjA5IDAwMDAwIG4gCjAwMDAwMDAzMDUgMDAwMDAgbiAKMDAwMDAwMDM3MyAwMDAwMCBuIAp0cmFpbGVyCjw8L1Jvb3QgMSAwIFIvU2l6ZSA3Pj4Kc3RhcnR4cmVmCjQyOQolJUVPRgo='
     }
 ];
+
+    

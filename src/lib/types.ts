@@ -1,3 +1,4 @@
+
 export type Status = 'Draft' | 'In Progress' | 'Submitted' | 'Approved' | 'Rejected';
 
 export type Address = {
@@ -66,6 +67,7 @@ export type PermitPackage = {
   septicPermitOrSewerCompany?: string;
   electricalServiceAmps?: number;
   waterServiceSource?: string;
+  parcelId?: string;
 };
 
 export type PDFTemplate = {
@@ -80,3 +82,5 @@ export type PermitType = {
   name: string;
   checklist: Omit<ChecklistItem, 'id' | 'completed'>[];
 };
+
+    
