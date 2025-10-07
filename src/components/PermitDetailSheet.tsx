@@ -32,6 +32,7 @@ import {
   Users,
   PlusCircle,
   Trash2,
+  Fingerprint,
 } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
@@ -273,7 +274,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
         <SheetContent className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col">
           <SheetHeader>
             <SheetTitle className="text-2xl">{permit.packageName}</SheetTitle>
-            <SheetDescription asChild>
+            <SheetDescription>
               <div className="flex items-center gap-2 text-muted-foreground">
                 ID: {permit.id}
                 <Badge className={statusColors[permit.status]}>{permit.status}</Badge>
@@ -291,6 +292,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
                   <DetailItem icon={Building} label="Use of Building">{permit.buildingUse}</DetailItem>
                   <DetailItem icon={DollarSign} label="Construction Cost">{formatCurrency(permit.constructionCost)}</DetailItem>
                   <DetailItem icon={MapPin} label="Property Address">{permit.property.address.street}, {permit.county}</DetailItem>
+                  <DetailItem icon={Fingerprint} label="Parcel ID">{permit.property.parcelId}</DetailItem>
                   <DetailItem icon={User} label="Customer">{permit.customer.name}</DetailItem>
                   <DetailItem icon={HardHat} label="Contractor">{permit.contractor.name}</DetailItem>
                   
