@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -16,7 +17,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { floridaCounties, contractors, permitTypes, countyData } from '@/lib/data';
+import { floridaCounties, contractors, permitTypes, countyData, countyPermitChecklists } from '@/lib/data';
 import type { PermitPackage } from '@/lib/types';
 import { PlusCircle } from 'lucide-react';
 import { Textarea } from './ui/textarea';
@@ -80,20 +81,19 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
       return;
     }
     
-    const selectedPermitType = permitTypes.find(pt => pt.id === data.permitTypeId);
-    const countyChecklist = countyData.find(c => c.name === data.county)?.checklist || [];
+    // Determine the correct checklist
+    const specificChecklist = countyPermitChecklists[data.county]?.[data.permitTypeId];
+    const fallbackChecklist = countyData.find(c => c.name === data.county)?.checklist || [];
     
-    let newChecklist = [];
-    if (selectedPermitType?.checklist) {
-      newChecklist = selectedPermitType.checklist.map((item, index) => ({
-          id: `new_${data.county}_${selectedPermitType!.id}_${index}`,
+    let rawChecklist = [];
+    if (specificChecklist) {
+      rawChecklist = specificChecklist.map((item, index) => ({
+          id: `new_${data.county}_${data.permitTypeId}_${index}`,
           text: item.text,
           completed: false,
       }));
-    }
-
-    if(newChecklist.length === 0){
-        newChecklist.push(...countyChecklist);
+    } else {
+      rawChecklist.push(...fallbackChecklist);
     }
 
     const newPackage: PermitPackage = {
@@ -120,7 +120,7 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
           zip: '', // Placeholder
         },
       },
-      checklist: newChecklist,
+      checklist: rawChecklist,
       attachments: [],
       createdAt: new Date().toISOString(),
       descriptionOfWork: data.descriptionOfWork,
@@ -421,3 +421,5 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
     </Dialog>
   );
 }
+
+    

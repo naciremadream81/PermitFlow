@@ -17,7 +17,7 @@ export type Customer = {
 };
 
 export type Contractor = {
-  id: string;
+  id:string;
   name: string;
   licenseNumber: string;
   trade: string;
@@ -80,7 +80,14 @@ export type PDFTemplate = {
 export type PermitType = {
   id: string;
   name: string;
-  checklist: Omit<ChecklistItem, 'id' | 'completed'>[];
 };
+
+export type BareChecklistItem = Omit<ChecklistItem, 'id' | 'completed'>;
+
+export interface CountyPermitChecklists {
+  [county: string]: {
+    [permitTypeId: string]: BareChecklistItem[];
+  };
+}
 
     

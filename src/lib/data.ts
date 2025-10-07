@@ -1,5 +1,5 @@
 
-import type { PermitPackage, County, Customer, Contractor, Property, PDFTemplate, PermitType } from './types';
+import type { PermitPackage, County, Customer, Contractor, Property, PDFTemplate, PermitType, CountyPermitChecklists } from './types';
 
 const floridaAddress = { street: '123 Sunshine State St', city: 'Miami', state: 'FL', zip: '33101' };
 
@@ -48,41 +48,24 @@ export const permitTypes: PermitType[] = [
     {
         id: 'pt_new_build',
         name: 'New Single Family Home',
-        checklist: [
-            { text: 'Foundation Plans' },
-            { text: 'Framing Plans' },
-            { text: 'Electrical Plans' },
-            { text: 'Plumbing Plans' },
-            { text: 'Mechanical Plans (HVAC)' },
-            { text: 'Roofing Details' },
-            { text: 'Energy Code Compliance Forms' },
-        ],
     },
     {
         id: 'pt_mobile_home',
         name: 'Mobile/Manufactured Home',
-        checklist: [
-            { text: 'Application Package for Mobile/Manufactured Home Permit' },
-            { text: 'Notice of Commencement (if contract > $5,000)' },
-            { text: 'HUD Wind Zone 3 Letter from Manufacturer' },
-            { text: 'Foundation and Stairs Plans' },
-            { text: 'Drainage/Site Plan' },
-            { text: 'Survey' },
-            { text: 'Drainage Survey (As Built)' },
-            { text: 'Tree Permit Application Package (if removing trees)' },
-            { text: 'No Public Utility Structures On-Site Affidavit' },
-            { text: 'Fire Hydrant Accessibility/Location Affidavit' },
-            { text: 'Public Sewer, Private Septic & Water Service Affidavit' },
-            { text: 'Subcontractor Worksheet' },
-            { text: 'CCU Application or FDOH Septic Permit' },
-            { text: 'Elevation Certificate (Final, if in SFHA)' },
-            { text: 'No Impact Certification (if in floodway)' },
-        ],
     },
     {
         id: 'pt_modular',
         name: 'Modular Home',
-        checklist: [
+    },
+    {
+        id: 'pt_remodel',
+        name: 'Major Remodel / Addition',
+    },
+];
+
+export const countyPermitChecklists: CountyPermitChecklists = {
+    'Charlotte': {
+        'pt_modular': [
             { text: 'Application for Construction Permit' },
             { text: 'Tree Permit Application Package' },
             { text: 'Notice of Commencement (1 copy signed and recorded): Any improvement for which the direct contract price is greater than $5,000. Must be submitted prior to scheduling the first inspection.' },
@@ -99,19 +82,24 @@ export const permitTypes: PermitType[] = [
             { text: 'Subcontractor Worksheet: Required if contractor is hiring a subcontractor to perform any electric, mechanical, or plumbing' },
             { text: 'Owner-Builder Disclosure Statement Form (if applicable)' },
         ],
-    },
-    {
-        id: 'pt_remodel',
-        name: 'Major Remodel / Addition',
-        checklist: [
-            { text: 'As-Built Drawings of Existing Structure' },
-            { text: 'Demolition Plans' },
-            { text: 'Proposed Floor Plans' },
-            { text: 'Structural Modifications Details' },
-            { text: 'Electrical/Plumbing Updates' },
-        ],
-    },
-];
+        'pt_mobile_home': [
+            { text: 'Application Package for Mobile/Manufactured Home Permit' },
+            { text: 'Notice of Commencement (1 copy signed and recorded): Any improvement for which the direct contract price is greater than $5,000. Must be submitted prior to scheduling the first inspection.' },
+            { text: 'Drawings/Plans/Engineering: Site specific letter from manufacturer that shows the mobile/manufactured home to be delivered at address is a HUD Wind Zone 3 home. Must provide foundation and stairs plans.' },
+            { text: 'Drainage/Site Plan: Showing the proposed structure(s), setbacks from the structure to the property lines, seawall, or mean highwater line to the structure, any easements on the property, street names, and existing and proposed ground elevations adjacent to the building, the property lines, and property corners (minimum), as well as the proposed final elevations of the different floor areas. Include one site plan for right-of-way (ROW) review showing proposed driveway.' },
+            { text: 'Survey' },
+            { text: 'Drainage Survey (As Built): Prepared, signed and sealed by a registered surveyor indicating post-construction elevations. The plan must be submitted for approval prior to requesting any final inspections.' },
+            { text: 'Tree Permit Application Package (if removing trees)' },
+            { text: 'No Public Utility Structures On-Site Affidavit' },
+            { text: 'Fire Hydrant Accessibility/Location Affidavit' },
+            { text: 'Public Sewer, Private Septic & Water Service Affidavit' },
+            { text: 'Subcontractor Worksheet: Required if contractor is hiring a subcontractor to perform any electric, mechanical, plumbing, or roofing' },
+            { text: 'CCU or State of Florida Department of Health (FDOH): Either a Charlotte County Utilities (CCU) application, an approved septic permit from the FDOH, or a letter from the utility company that provides service to that location' },
+            { text: 'Elevation Certificate (Final): Prepared by a registered surveyor, is required if the property is within the Special Flood Hazard Area. The certificate must be submitted for approval prior to requesting any final inspections. The document may be emailed to FloodInfo@CharlotteCountyFL.gov.' },
+            { text: 'No Impact Certification: Required only if fill, new construction, substantial improvements, and other development within the adopted regulatory floodway is proposed. The certification shall demonstrate that the proposed encroachment would not result in any increase in flood levels.' },
+        ]
+    }
+};
 
 
 export const permitPackages: PermitPackage[] = [
