@@ -44,6 +44,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Textarea } from './ui/textarea';
 import { cn } from '@/lib/utils';
 import useLocalStorage from '@/hooks/use-local-storage';
+import JSZip from 'jszip';
 
 interface PermitDetailSheetProps {
   permit: PermitPackage | null;
@@ -182,22 +183,33 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     onUpdatePackage({ ...permit, attachments: updatedAttachments });
   };
   
-  const handleDownloadAll = () => {
+  const handleDownloadAll = async () => {
     if (attachments.length === 0) {
       toast({ variant: 'destructive', title: 'No files to download' });
       return;
     }
-    // This is a simplified download. A real app might zip these on a server.
+    
+    toast({ title: 'Zipping files...', description: 'Please wait while we prepare your download.' });
+
+    const zip = new JSZip();
     attachments.forEach(file => {
+        zip.file(file.name, file);
+    });
+
+    try {
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(file);
-        link.download = file.name;
+        link.href = URL.createObjectURL(zipBlob);
+        link.download = `${permit.id}-attachments.zip`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
-    });
-    toast({ title: 'Success', description: 'Your downloads have started.' });
+        toast({ title: 'Success', description: 'Your download has started.' });
+    } catch(e) {
+        console.error("Zipping error:", e);
+        toast({ variant: 'destructive', title: 'Error', description: 'Could not create zip file.' });
+    }
   }
 
   const handleGenerateData = async () => {
@@ -274,7 +286,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
         <SheetContent className="w-full sm:max-w-2xl lg:max-w-3xl flex flex-col">
           <SheetHeader>
             <SheetTitle className="text-2xl">{permit.packageName}</SheetTitle>
-            <SheetDescription>
+            <SheetDescription asChild>
               <div className="flex items-center gap-2 text-muted-foreground">
                 ID: {permit.id}
                 <Badge className={statusColors[permit.status]}>{permit.status}</Badge>
