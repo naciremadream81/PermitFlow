@@ -61,6 +61,68 @@ const statusColors: { [key: string]: string } = {
   Rejected: 'bg-red-200 text-red-800',
 };
 
+const ChecklistComponent = ({
+    title,
+    checklist,
+    onChecklistChange,
+    onFileChange,
+    removeAttachment,
+    fileInputRefs
+}: {
+    title: string;
+    checklist: ChecklistItem[];
+    onChecklistChange: (itemId: string, checked: boolean) => void;
+    onFileChange: (event: React.ChangeEvent<HTMLInputElement>, itemId: string) => void;
+    removeAttachment: (itemId: string, fileToRemove: File) => void;
+    fileInputRefs: React.MutableRefObject<Record<string, HTMLInputElement | null>>;
+}) => {
+    return (
+        <div>
+            <h3 className="text-lg font-semibold mb-3">{title}</h3>
+            <div className="space-y-3">
+            {checklist.map((item) => (
+                <div key={item.id} className="p-3 border rounded-lg">
+                <div className="flex items-center space-x-3">
+                    <Checkbox
+                    id={item.id}
+                    checked={item.completed}
+                    onCheckedChange={(checked) => onChecklistChange(item.id, !!checked)}
+                    />
+                    <Label htmlFor={item.id} className={`flex-1 ${item.completed ? 'line-through text-muted-foreground' : ''}`}>{item.text}</Label>
+                    <Button variant="outline" size="sm" onClick={() => fileInputRefs.current[item.id]?.click()}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Attach
+                    </Button>
+                    <input
+                    type="file"
+                    ref={el => (fileInputRefs.current[item.id] = el)}
+                    onChange={(e) => onFileChange(e, item.id)}
+                    className="hidden"
+                    multiple
+                    />
+                </div>
+                {item.attachments && item.attachments.length > 0 && (
+                    <div className="pl-8 pt-2 space-y-1">
+                    {item.attachments.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                            <Paperclip className="h-3 w-3" />
+                            <span>{file.name}</span>
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => removeAttachment(item.id, file)}>
+                            <X className="h-3 w-3" />
+                        </Button>
+                        </div>
+                    ))}
+                    </div>
+                )}
+                </div>
+            ))}
+            </div>
+      </div>
+    )
+}
+
 const ManageSubcontractorsDialog = ({
   permit,
   onUpdatePackage,
@@ -69,6 +131,8 @@ const ManageSubcontractorsDialog = ({
 }: { permit: PermitPackage, onUpdatePackage: (pkg: PermitPackage) => void, open: boolean, onOpenChange: (open: boolean) => void }) => {
   const [contractors] = useLocalStorage<Contractor[]>('contractors', allContractors);
   const [selectedSub, setSelectedSub] = React.useState('');
+
+  if (!permit) return null;
 
   const currentSubs = permit.subcontractors || [];
   const availableContractors = contractors.filter(c => 
@@ -151,7 +215,10 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
   const allAttachments = React.useMemo(() => {
     if (!permit) return [];
     const files = new Set<File>();
-    permit.checklist.forEach(item => {
+    (permit.standardChecklist || []).forEach(item => {
+      item.attachments?.forEach(file => files.add(file));
+    });
+    (permit.countyChecklist || []).forEach(item => {
       item.attachments?.forEach(file => files.add(file));
     });
     return Array.from(files);
@@ -165,36 +232,68 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
 
   if (!permit) return null;
 
-  const handleChecklistChange = (itemId: string, checked: boolean) => {
-    const updatedChecklist = permit.checklist.map((item) =>
+  const handleStandardChecklistChange = (itemId: string, checked: boolean) => {
+    const updatedChecklist = permit.standardChecklist.map((item) =>
       item.id === itemId ? { ...item, completed: checked } : item
     );
-    onUpdatePackage({ ...permit, checklist: updatedChecklist });
+    onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
+  };
+  
+  const handleCountyChecklistChange = (itemId: string, checked: boolean) => {
+    const updatedChecklist = permit.countyChecklist.map((item) =>
+      item.id === itemId ? { ...item, completed: checked } : item
+    );
+    onUpdatePackage({ ...permit, countyChecklist: updatedChecklist });
   };
   
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, itemId: string) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
-      const updatedChecklist = permit.checklist.map((item) => {
-        if (item.id === itemId) {
-          const currentAttachments = item.attachments || [];
-          return { ...item, attachments: [...currentAttachments, ...newFiles] };
-        }
-        return item;
-      });
-      onUpdatePackage({ ...permit, checklist: updatedChecklist });
+      const isStandard = permit.standardChecklist.some(item => item.id === itemId);
+
+      if (isStandard) {
+        const updatedChecklist = permit.standardChecklist.map((item) => {
+            if (item.id === itemId) {
+                const currentAttachments = item.attachments || [];
+                return { ...item, attachments: [...currentAttachments, ...newFiles] };
+            }
+            return item;
+        });
+        onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
+      } else {
+        const updatedChecklist = permit.countyChecklist.map((item) => {
+            if (item.id === itemId) {
+                const currentAttachments = item.attachments || [];
+                return { ...item, attachments: [...currentAttachments, ...newFiles] };
+            }
+            return item;
+        });
+        onUpdatePackage({ ...permit, countyChecklist: updatedChecklist });
+      }
     }
   };
   
   const removeAttachment = (itemId: string, fileToRemove: File) => {
-    const updatedChecklist = permit.checklist.map((item) => {
-      if (item.id === itemId) {
-        const updatedAttachments = (item.attachments || []).filter(file => file !== fileToRemove);
-        return { ...item, attachments: updatedAttachments };
-      }
-      return item;
-    });
-    onUpdatePackage({ ...permit, checklist: updatedChecklist });
+    const isStandard = permit.standardChecklist.some(item => item.id === itemId);
+    if (isStandard) {
+        const updatedChecklist = permit.standardChecklist.map((item) => {
+            if (item.id === itemId) {
+                const updatedAttachments = (item.attachments || []).filter(file => file !== fileToRemove);
+                return { ...item, attachments: updatedAttachments };
+            }
+            return item;
+        });
+        onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
+    } else {
+        const updatedChecklist = permit.countyChecklist.map((item) => {
+            if (item.id === itemId) {
+                const updatedAttachments = (item.attachments || []).filter(file => file !== fileToRemove);
+                return { ...item, attachments: updatedAttachments };
+            }
+            return item;
+        });
+        onUpdatePackage({ ...permit, countyChecklist: updatedChecklist });
+    }
   };
 
   const handleDownloadAll = async () => {
@@ -345,50 +444,26 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
             </div>
             
             <Separator />
+
+            <ChecklistComponent 
+              title="Standard Documents"
+              checklist={permit.standardChecklist}
+              onChecklistChange={handleStandardChecklistChange}
+              onFileChange={handleFileChange}
+              removeAttachment={removeAttachment}
+              fileInputRefs={fileInputRefs}
+            />
+
+            <Separator />
             
-            <div>
-              <h3 className="text-lg font-semibold mb-3">County Checklist</h3>
-              <div className="space-y-3">
-                {permit.checklist.map((item) => (
-                  <div key={item.id} className="p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <Checkbox
-                        id={item.id}
-                        checked={item.completed}
-                        onCheckedChange={(checked) => handleChecklistChange(item.id, !!checked)}
-                      />
-                      <Label htmlFor={item.id} className={`flex-1 ${item.completed ? 'line-through text-muted-foreground' : ''}`}>{item.text}</Label>
-                      <Button variant="outline" size="sm" onClick={() => fileInputRefs.current[item.id]?.click()}>
-                        <Upload className="mr-2 h-4 w-4" />
-                        Attach
-                      </Button>
-                      <input
-                        type="file"
-                        ref={el => (fileInputRefs.current[item.id] = el)}
-                        onChange={(e) => handleFileChange(e, item.id)}
-                        className="hidden"
-                        multiple
-                      />
-                    </div>
-                    {item.attachments && item.attachments.length > 0 && (
-                      <div className="pl-8 pt-2 space-y-1">
-                        {item.attachments.map((file, index) => (
-                          <div key={index} className="flex items-center justify-between text-sm">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Paperclip className="h-3 w-3" />
-                              <span>{file.name}</span>
-                            </div>
-                            <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => removeAttachment(item.id, file)}>
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ChecklistComponent 
+              title="County-Specific Documents"
+              checklist={permit.countyChecklist}
+              onChecklistChange={handleCountyChecklistChange}
+              onFileChange={handleFileChange}
+              removeAttachment={removeAttachment}
+              fileInputRefs={fileInputRefs}
+            />
             
             <Separator />
 
@@ -467,12 +542,12 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
         </DialogContent>
       </Dialog>
       
-      {permit && <ManageSubcontractorsDialog 
+      <ManageSubcontractorsDialog 
         permit={permit} 
         onUpdatePackage={onUpdatePackage}
         open={isSubcontractorDialogOpen}
         onOpenChange={setSubcontractorDialogOpen}
-      />}
+      />
     </>
   );
 }

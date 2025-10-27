@@ -31,17 +31,23 @@ export const floridaCounties: string[] = [
     "Suwannee", "Taylor", "Union", "Volusia", "Wakulla", "Walton", "Washington"
 ];
 
-const defaultChecklist = [
-  { id: 'chk_01', text: 'Notice of Commencement', completed: false, attachments: [] },
-  { id: 'chk_02', text: 'Site Plan / Plot Plan', completed: false, attachments: [] },
-  { id: 'chk_03', text: 'Floor Plans', completed: false, attachments: [] },
-  { id: 'chk_04', text: 'Energy Calculations', completed: false, attachments: [] },
-  { id: 'chk_05', text: 'HVAC Duct Layout', completed: false, attachments: [] },
+export const standardPackageChecklist = [
+  { id: 'std_01', text: 'Completed Permit Application', completed: false },
+  { id: 'std_02', text: 'Notice of Commencement', completed: false },
+  { id: 'std_03', text: 'Contractor License & Insurance', completed: false },
+  { id: 'std_04', text: 'Owner-Builder Disclosure (if applicable)', completed: false },
+];
+
+
+const defaultCountyChecklist = [
+  { id: 'county_01', text: 'County-specific Site Plan', completed: false, attachments: [] },
+  { id: 'county_02', text: 'County-specific Floor Plans', completed: false, attachments: [] },
+  { id: 'county_03', text: 'County-specific Energy Calculations', completed: false, attachments: [] },
 ];
 
 export const countyData: County[] = floridaCounties.map(name => ({
   name,
-  checklist: defaultChecklist.map(item => ({...item, id: `${name.toLowerCase().replace(/\s/g, '-')}_${item.id}`}))
+  checklist: defaultCountyChecklist.map(item => ({...item, id: `${name.toLowerCase().replace(/\s/g, '-')}_${item.id}`}))
 }));
 
 export const permitTypes: PermitType[] = [
@@ -112,12 +118,12 @@ export const permitPackages: PermitPackage[] = [
     contractor: contractors[0],
     subcontractors: [contractors[2], contractors[3], contractors[4]],
     property: properties[0],
-    checklist: (countyData.find(c => c.name === 'Miami-Dade')?.checklist || []).map(item => ({...item, attachments: []})),
+    standardChecklist: standardPackageChecklist.map(item => ({...item, attachments: []})),
+    countyChecklist: (countyData.find(c => c.name === 'Miami-Dade')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-28T10:00:00Z',
     descriptionOfWork: 'New single family home construction',
     buildingUse: 'Single Family Residential',
     constructionCost: 350000,
-    parcelId: '01-2345-000-0000'
   },
   {
     id: 'PKG-2024-002',
@@ -128,12 +134,12 @@ export const permitPackages: PermitPackage[] = [
     contractor: contractors[1],
     subcontractors: [],
     property: properties[1],
-    checklist: (countyData.find(c => c.name === 'Orange')?.checklist || []).map(item => ({...item, attachments: []})),
+    standardChecklist: standardPackageChecklist.map(item => ({...item, attachments: []})),
+    countyChecklist: (countyData.find(c => c.name === 'Orange')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-29T14:30:00Z',
     descriptionOfWork: 'Installation of a new modular home on existing lot.',
     buildingUse: 'Modular Home',
     constructionCost: 150000,
-    parcelId: '123-456-789'
   },
     {
     id: 'PKG-2024-003',
@@ -144,12 +150,12 @@ export const permitPackages: PermitPackage[] = [
     contractor: contractors[1],
     subcontractors: [],
     property: { id: 'prop_003', parcelId: '03-4567-000-0000', address: { street: '789 Lake Rd', city: 'Lakeland', state: 'FL', zip: '33801' } },
-    checklist: (countyData.find(c => c.name === 'Polk')?.checklist || []).map(item => ({...item, attachments: []})),
+    standardChecklist: standardPackageChecklist.map(item => ({...item, attachments: []})),
+    countyChecklist: (countyData.find(c => c.name === 'Polk')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-30T09:00:00Z',
     descriptionOfWork: 'Site prep and setup for a new manufactured home.',
     buildingUse: 'Manufactured Home',
     constructionCost: 85000,
-    parcelId: '987-654-321'
   },
 ];
 

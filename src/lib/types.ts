@@ -56,7 +56,8 @@ export type PermitPackage = {
   contractor: Contractor;
   subcontractors?: Contractor[];
   property: Property;
-  checklist: ChecklistItem[];
+  standardChecklist: ChecklistItem[];
+  countyChecklist: ChecklistItem[];
   createdAt: string;
   // New fields from permit application
   descriptionOfWork: string;
@@ -67,7 +68,6 @@ export type PermitPackage = {
   septicPermitOrSewerCompany?: string;
   electricalServiceAmps?: number;
   waterServiceSource?: string;
-  parcelId?: string;
 };
 
 export type PDFTemplate = {
