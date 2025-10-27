@@ -32,11 +32,11 @@ export const floridaCounties: string[] = [
 ];
 
 const defaultChecklist = [
-  { id: 'chk_01', text: 'Notice of Commencement', completed: false },
-  { id: 'chk_02', text: 'Site Plan / Plot Plan', completed: true },
-  { id: 'chk_03', text: 'Floor Plans', completed: false },
-  { id: 'chk_04', text: 'Energy Calculations', completed: false },
-  { id: 'chk_05', text: 'HVAC Duct Layout', completed: false },
+  { id: 'chk_01', text: 'Notice of Commencement', completed: false, attachments: [] },
+  { id: 'chk_02', text: 'Site Plan / Plot Plan', completed: false, attachments: [] },
+  { id: 'chk_03', text: 'Floor Plans', completed: false, attachments: [] },
+  { id: 'chk_04', text: 'Energy Calculations', completed: false, attachments: [] },
+  { id: 'chk_05', text: 'HVAC Duct Layout', completed: false, attachments: [] },
 ];
 
 export const countyData: County[] = floridaCounties.map(name => ({
@@ -112,11 +112,12 @@ export const permitPackages: PermitPackage[] = [
     contractor: contractors[0],
     subcontractors: [contractors[2], contractors[3], contractors[4]],
     property: properties[0],
-    checklist: countyData.find(c => c.name === 'Miami-Dade')?.checklist || [],
+    checklist: (countyData.find(c => c.name === 'Miami-Dade')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-28T10:00:00Z',
     descriptionOfWork: 'New single family home construction',
     buildingUse: 'Single Family Residential',
     constructionCost: 350000,
+    parcelId: '01-2345-000-0000'
   },
   {
     id: 'PKG-2024-002',
@@ -127,7 +128,7 @@ export const permitPackages: PermitPackage[] = [
     contractor: contractors[1],
     subcontractors: [],
     property: properties[1],
-    checklist: countyData.find(c => c.name === 'Orange')?.checklist || [],
+    checklist: (countyData.find(c => c.name === 'Orange')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-29T14:30:00Z',
     descriptionOfWork: 'Installation of a new modular home on existing lot.',
     buildingUse: 'Modular Home',
@@ -143,7 +144,7 @@ export const permitPackages: PermitPackage[] = [
     contractor: contractors[1],
     subcontractors: [],
     property: { id: 'prop_003', parcelId: '03-4567-000-0000', address: { street: '789 Lake Rd', city: 'Lakeland', state: 'FL', zip: '33801' } },
-    checklist: countyData.find(c => c.name === 'Polk')?.checklist || [],
+    checklist: (countyData.find(c => c.name === 'Polk')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-30T09:00:00Z',
     descriptionOfWork: 'Site prep and setup for a new manufactured home.',
     buildingUse: 'Manufactured Home',

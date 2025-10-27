@@ -35,6 +35,7 @@ export function ChecklistManager() {
         id: `${county.name.toLowerCase()}_${Date.now()}`,
         text: newItemText.trim(),
         completed: false,
+        attachments: [],
       };
       handleUpdate({ ...county, checklist: [...county.checklist, newItem] });
       setNewItemText('');
@@ -67,8 +68,8 @@ export function ChecklistManager() {
     <>
       <div className="mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center">
         <div className="flex-1">
-            <h2 className="text-2xl font-bold tracking-tight">Checklist Editor</h2>
-            <p className="text-muted-foreground">Select a county to view and edit its permit checklist.</p>
+            <h2 className="text-2xl font-bold tracking-tight">County Checklist Manager</h2>
+            <p className="text-muted-foreground">Select a county to view and customize its permit checklist.</p>
         </div>
         <Select onValueChange={setSelectedCounty}>
           <SelectTrigger className="w-full md:w-[250px]">
@@ -88,7 +89,7 @@ export function ChecklistManager() {
         <Card>
           <CardHeader>
             <CardTitle>{county.name} County Checklist</CardTitle>
-            <CardDescription>Add, edit, or remove items from this checklist.</CardDescription>
+            <CardDescription>Add, edit, or remove items from this county's checklist. Changes are saved locally.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
