@@ -17,7 +17,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { floridaCounties, contractors, permitTypes, countyData, countyPermitChecklists, standardPackageChecklist } from '@/lib/data';
+import { floridaCounties, contractors, permitTypes, standardPackageChecklist } from '@/lib/data';
 import type { PermitPackage } from '@/lib/types';
 import { PlusCircle } from 'lucide-react';
 import { Textarea } from './ui/textarea';
@@ -81,21 +81,6 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
       return;
     }
     
-    const specificChecklist = countyPermitChecklists[data.county]?.[data.permitTypeId];
-    const fallbackChecklist = countyData.find(c => c.name === data.county)?.checklist || [];
-    
-    let rawCountyChecklist = [];
-    if (specificChecklist) {
-      rawCountyChecklist = specificChecklist.map((item, index) => ({
-          id: `county_${data.county}_${data.permitTypeId}_${index}`,
-          text: item.text,
-          completed: false,
-          attachments: []
-      }));
-    } else {
-       rawCountyChecklist = fallbackChecklist.map(item => ({...item, attachments: []}));
-    }
-
     const newPackage: PermitPackage = {
       id: `PKG-${Date.now()}`,
       packageName: data.packageName,
@@ -121,7 +106,6 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         },
       },
       standardChecklist: standardPackageChecklist.map(item => ({...item, attachments: []})),
-      countyChecklist: rawCountyChecklist,
       createdAt: new Date().toISOString(),
       descriptionOfWork: data.descriptionOfWork,
       buildingUse: data.buildingUse,

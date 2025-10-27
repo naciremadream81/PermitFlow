@@ -1,5 +1,5 @@
 
-import type { PermitPackage, County, Customer, Contractor, Property, PDFTemplate, PermitType, CountyPermitChecklists } from './types';
+import type { PermitPackage, Customer, Contractor, Property, PDFTemplate, PermitType } from './types';
 
 const floridaAddress = { street: '123 Sunshine State St', city: 'Miami', state: 'FL', zip: '33101' };
 
@@ -38,18 +38,6 @@ export const standardPackageChecklist = [
   { id: 'std_04', text: 'Owner-Builder Disclosure (if applicable)', completed: false },
 ];
 
-
-const defaultCountyChecklist = [
-  { id: 'county_01', text: 'County-specific Site Plan', completed: false, attachments: [] },
-  { id: 'county_02', text: 'County-specific Floor Plans', completed: false, attachments: [] },
-  { id: 'county_03', text: 'County-specific Energy Calculations', completed: false, attachments: [] },
-];
-
-export const countyData: County[] = floridaCounties.map(name => ({
-  name,
-  checklist: defaultCountyChecklist.map(item => ({...item, id: `${name.toLowerCase().replace(/\s/g, '-')}_${item.id}`}))
-}));
-
 export const permitTypes: PermitType[] = [
     {
         id: 'pt_new_build',
@@ -69,45 +57,6 @@ export const permitTypes: PermitType[] = [
     },
 ];
 
-export const countyPermitChecklists: CountyPermitChecklists = {
-    'Charlotte': {
-        'pt_modular': [
-            { text: 'Application for Construction Permit' },
-            { text: 'Tree Permit Application Package' },
-            { text: 'Notice of Commencement (1 copy signed and recorded): Any improvement for which the direct contract price is greater than $5,000. Must be submitted prior to scheduling the first inspection.' },
-            { text: 'Drawings/Plans/Engineering: Proof of Florida DBPR approval. Must convey the full extent of proposed work – legible and of sufficient clarity. Foundation drawings/plans need to be signed and sealed. If applying for a permit in person, plans must be wet or embossed with a signature. If applying for a permit online, plans must be digitally signed and sealed with a third-party verification.' },
-            { text: 'Elevation Certificate (Final): Prepared by a registered surveyor, is required if the property is within the Special Flood Hazard Area. The certificate must be submitted for approval prior to requesting any final inspections. The document may be emailed to FloodInfo@CharlotteCountyFL.gov.' },
-            { text: 'Drainage/Site Plan: Showing the proposed structure(s), setbacks from the structure to the property lines, seawall, or mean highwater line to the structure, any easements on the property, street names, and existing and proposed ground elevations adjacent to the building, the property lines, and property corners (minimum), as well as the proposed final elevations of the different floor areas. Include one site plan for right-of-way (ROW) review showing proposed driveway.' },
-            { text: 'Survey' },
-            { text: 'Drainage Survey (As Built): Prepared, signed and sealed by a registered surveyor indicating post-construction elevations. The plan must be submitted for approval prior to requesting any final inspections.' },
-            { text: 'Tree Permit Application Package (if removing trees)' },
-            { text: 'CCU or State of Florida Department of Health (FDOH): Either a Charlotte County Utilities (CCU) application, an approved septic permit from the FDOH, or a letter from the utility company that provides service to that location' },
-            { text: 'No Public Utility Structures On-Site Affidavit' },
-            { text: 'Fire Hydrant Accessibility/Location Affidavit' },
-            { text: 'Public Sewer, Private Septic & Water Service Affidavit' },
-            { text: 'Subcontractor Worksheet: Required if contractor is hiring a subcontractor to perform any electric, mechanical, or plumbing' },
-            { text: 'Owner-Builder Disclosure Statement Form (if applicable)' },
-        ],
-        'pt_mobile_home': [
-            { text: 'Application Package for Mobile/Manufactured Home Permit' },
-            { text: 'Notice of Commencement (1 copy signed and recorded): Any improvement for which the direct contract price is greater than $5,000. Must be submitted prior to scheduling the first inspection.' },
-            { text: 'Drawings/Plans/Engineering: Site specific letter from manufacturer that shows the mobile/manufactured home to be delivered at address is a HUD Wind Zone 3 home. Must provide foundation and stairs plans.' },
-            { text: 'Drainage/Site Plan: Showing the proposed structure(s), setbacks from the structure to the property lines, seawall, or mean highwater line to the structure, any easements on the property, street names, and existing and proposed ground elevations adjacent to the building, the property lines, and property corners (minimum), as well as the proposed final elevations of the different floor areas. Include one site plan for right-of-way (ROW) review showing proposed driveway.' },
-            { text: 'Survey' },
-            { text: 'Drainage Survey (As Built): Prepared, signed and sealed by a registered surveyor indicating post-construction elevations. The plan must be submitted for approval prior to requesting any final inspections.' },
-            { text: 'Tree Permit Application Package (if removing trees)' },
-            { text: 'No Public Utility Structures On-Site Affidavit' },
-            { text: 'Fire Hydrant Accessibility/Location Affidavit' },
-            { text: 'Public Sewer, Private Septic & Water Service Affidavit' },
-            { text: 'Subcontractor Worksheet: Required if contractor is hiring a subcontractor to perform any electric, mechanical, plumbing, or roofing' },
-            { text: 'CCU or State of Florida Department of Health (FDOH): Either a Charlotte County Utilities (CCU) application, an approved septic permit from the FDOH, or a letter from the utility company that provides service to that location' },
-            { text: 'Elevation Certificate (Final): Prepared by a registered surveyor, is required if the property is within the Special Flood Hazard Area. The certificate must be submitted for approval prior to requesting any final inspections. The document may be emailed to FloodInfo@CharlotteCountyFL.gov.' },
-            { text: 'No Impact Certification: Required only if fill, new construction, substantial improvements, and other development within the adopted regulatory floodway is proposed. The certification shall demonstrate that the proposed encroachment would not result in any increase in flood levels.' },
-        ]
-    }
-};
-
-
 export const permitPackages: PermitPackage[] = [
   {
     id: 'PKG-2024-001',
@@ -119,7 +68,6 @@ export const permitPackages: PermitPackage[] = [
     subcontractors: [contractors[2], contractors[3], contractors[4]],
     property: properties[0],
     standardChecklist: standardPackageChecklist.map(item => ({...item, attachments: []})),
-    countyChecklist: (countyData.find(c => c.name === 'Miami-Dade')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-28T10:00:00Z',
     descriptionOfWork: 'New single family home construction',
     buildingUse: 'Single Family Residential',
@@ -135,7 +83,6 @@ export const permitPackages: PermitPackage[] = [
     subcontractors: [],
     property: properties[1],
     standardChecklist: standardPackageChecklist.map(item => ({...item, attachments: []})),
-    countyChecklist: (countyData.find(c => c.name === 'Orange')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-29T14:30:00Z',
     descriptionOfWork: 'Installation of a new modular home on existing lot.',
     buildingUse: 'Modular Home',
@@ -151,7 +98,6 @@ export const permitPackages: PermitPackage[] = [
     subcontractors: [],
     property: { id: 'prop_003', parcelId: '03-4567-000-0000', address: { street: '789 Lake Rd', city: 'Lakeland', state: 'FL', zip: '33801' } },
     standardChecklist: standardPackageChecklist.map(item => ({...item, attachments: []})),
-    countyChecklist: (countyData.find(c => c.name === 'Polk')?.checklist || []).map(item => ({...item, attachments: []})),
     createdAt: '2024-07-30T09:00:00Z',
     descriptionOfWork: 'Site prep and setup for a new manufactured home.',
     buildingUse: 'Manufactured Home',

@@ -219,9 +219,6 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     (permit.standardChecklist || []).forEach(item => {
       item.attachments?.forEach(file => files.add(file));
     });
-    (permit.countyChecklist || []).forEach(item => {
-      item.attachments?.forEach(file => files.add(file));
-    });
     return Array.from(files);
   }, [permit]);
 
@@ -234,67 +231,35 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
   if (!permit) return null;
 
   const handleStandardChecklistChange = (itemId: string, checked: boolean) => {
-    const updatedChecklist = permit.standardChecklist.map((item) =>
+    const updatedChecklist = (permit.standardChecklist || []).map((item) =>
       item.id === itemId ? { ...item, completed: checked } : item
     );
     onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
   };
   
-  const handleCountyChecklistChange = (itemId: string, checked: boolean) => {
-    const updatedChecklist = permit.countyChecklist.map((item) =>
-      item.id === itemId ? { ...item, completed: checked } : item
-    );
-    onUpdatePackage({ ...permit, countyChecklist: updatedChecklist });
-  };
-  
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, itemId: string) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
-      const isStandard = permit.standardChecklist.some(item => item.id === itemId);
-
-      if (isStandard) {
-        const updatedChecklist = permit.standardChecklist.map((item) => {
-            if (item.id === itemId) {
-                const currentAttachments = item.attachments || [];
-                return { ...item, attachments: [...currentAttachments, ...newFiles] };
-            }
-            return item;
-        });
-        onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
-      } else {
-        const updatedChecklist = permit.countyChecklist.map((item) => {
-            if (item.id === itemId) {
-                const currentAttachments = item.attachments || [];
-                return { ...item, attachments: [...currentAttachments, ...newFiles] };
-            }
-            return item;
-        });
-        onUpdatePackage({ ...permit, countyChecklist: updatedChecklist });
-      }
+      const updatedChecklist = (permit.standardChecklist || []).map((item) => {
+          if (item.id === itemId) {
+              const currentAttachments = item.attachments || [];
+              return { ...item, attachments: [...currentAttachments, ...newFiles] };
+          }
+          return item;
+      });
+      onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
     }
   };
   
   const removeAttachment = (itemId: string, fileToRemove: File) => {
-    const isStandard = permit.standardChecklist.some(item => item.id === itemId);
-    if (isStandard) {
-        const updatedChecklist = permit.standardChecklist.map((item) => {
-            if (item.id === itemId) {
-                const updatedAttachments = (item.attachments || []).filter(file => file !== fileToRemove);
-                return { ...item, attachments: updatedAttachments };
-            }
-            return item;
-        });
-        onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
-    } else {
-        const updatedChecklist = permit.countyChecklist.map((item) => {
-            if (item.id === itemId) {
-                const updatedAttachments = (item.attachments || []).filter(file => file !== fileToRemove);
-                return { ...item, attachments: updatedAttachments };
-            }
-            return item;
-        });
-        onUpdatePackage({ ...permit, countyChecklist: updatedChecklist });
-    }
+    const updatedChecklist = (permit.standardChecklist || []).map((item) => {
+        if (item.id === itemId) {
+            const updatedAttachments = (item.attachments || []).filter(file => file !== fileToRemove);
+            return { ...item, attachments: updatedAttachments };
+        }
+        return item;
+    });
+    onUpdatePackage({ ...permit, standardChecklist: updatedChecklist });
   };
 
   const handleDownloadAll = async () => {
@@ -455,17 +420,6 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
               fileInputRefs={fileInputRefs}
             />
 
-            <Separator />
-            
-            <ChecklistComponent 
-              title="County-Specific Documents"
-              checklist={permit.countyChecklist}
-              onChecklistChange={handleCountyChecklistChange}
-              onFileChange={handleFileChange}
-              removeAttachment={removeAttachment}
-              fileInputRefs={fileInputRefs}
-            />
-            
             <Separator />
 
             <div>
