@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -5,7 +6,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, User, HardHat, MapPin, Calendar } from 'lucide-react';
 import { permitPackages as initialPermitPackages, floridaCounties } from '@/lib/data';
 import type { PermitPackage, Status } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +22,13 @@ const statusColors: { [key in Status]: string } = {
   Approved: 'border-transparent bg-green-200 text-green-800 hover:bg-green-200/80',
   Rejected: 'border-transparent bg-red-200 text-red-800 hover:bg-red-200/80',
 };
+
+const DetailItem = ({ icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        {React.createElement(icon, { className: 'h-4 w-4' })}
+        <span>{children}</span>
+    </div>
+);
 
 export default function DashboardPage() {
   const [packages, setPackages] = useLocalStorage<PermitPackage[]>('permitPackages', initialPermitPackages);
@@ -93,28 +101,29 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredPackages.map((pkg) => (
             <Card key={pkg.id} className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow duration-300" onClick={() => setSelectedPermit(pkg)}>
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <CardTitle className="leading-tight">{pkg.packageName}</CardTitle>
+              <CardHeader className="pb-4">
+                <div className="flex justify-between items-start gap-2">
+                  <CardTitle className="leading-tight text-lg">{pkg.packageName}</CardTitle>
                   <Badge variant="secondary" className={statusColors[pkg.status]}>
                     {pkg.status}
                   </Badge>
                 </div>
-                <CardDescription>{pkg.id}</CardDescription>
+                <CardDescription className="text-xs !mt-1">{pkg.id}</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2 text-sm">
-                  <p><span className="font-medium text-muted-foreground">Customer:</span> {pkg.customer.name}</p>
-                  <p><span className="font-medium text-muted-foreground">Contractor:</span> {pkg.contractor.name}</p>
-                  <p><span className="font-medium text-muted-foreground">County:</span> {pkg.county}</p>
-                  <p><span className="font-medium text-muted-foreground">Work:</span> {pkg.descriptionOfWork}</p>
-                </div>
+              <CardContent className="flex-1 space-y-3">
+                 <p className="text-sm text-muted-foreground line-clamp-2">{pkg.descriptionOfWork}</p>
+                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">
+                    <DetailItem icon={User}>{pkg.customer.name}</DetailItem>
+                    <DetailItem icon={HardHat}>{pkg.contractor.name}</DetailItem>
+                    <DetailItem icon={MapPin}>{pkg.county}</DetailItem>
+                    <DetailItem icon={Calendar}>{new Date(pkg.createdAt).toLocaleDateString()}</DetailItem>
+                 </div>
               </CardContent>
               <CardFooter>
-                 <p className="text-xs text-muted-foreground">Created: {new Date(pkg.createdAt).toLocaleDateString()}</p>
+                 
               </CardFooter>
             </Card>
           ))}
