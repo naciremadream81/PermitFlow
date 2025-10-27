@@ -148,6 +148,15 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
   const [selectedTemplateId, setSelectedTemplateId] = React.useState<string | undefined>();
   const fileInputRefs = React.useRef<Record<string, HTMLInputElement | null>>({});
 
+  const allAttachments = React.useMemo(() => {
+    if (!permit) return [];
+    const files = new Set<File>();
+    permit.checklist.forEach(item => {
+      item.attachments?.forEach(file => files.add(file));
+    });
+    return Array.from(files);
+  }, [permit]);
+
   React.useEffect(() => {
     // Reset generation state when sheet closes or permit changes
     setGeneratedData(null);
@@ -188,14 +197,6 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     onUpdatePackage({ ...permit, checklist: updatedChecklist });
   };
 
-  const allAttachments = React.useMemo(() => {
-    const files = new Set<File>();
-    permit.checklist.forEach(item => {
-      item.attachments?.forEach(file => files.add(file));
-    });
-    return Array.from(files);
-  }, [permit.checklist]);
-  
   const handleDownloadAll = async () => {
     if (allAttachments.length === 0) {
       toast({ variant: 'destructive', title: 'No files to download' });
