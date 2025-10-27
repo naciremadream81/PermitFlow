@@ -6,21 +6,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import useLocalStorage from '@/hooks/use-local-storage';
-import { contractors as initialContractors, permitPackages as initialPermitPackages } from '@/lib/data';
 import type { Contractor, PermitPackage, Status } from '@/lib/types';
 import { Download } from 'lucide-react';
+import { useUser, useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query } from 'firebase/firestore';
+import { contractors } from '@/lib/data';
 
 const statuses: Status[] = ['Draft', 'In Progress', 'Submitted', 'Approved', 'Rejected'];
 
 export function ReportGenerator() {
-  const [permitPackages] = useLocalStorage<PermitPackage[]>('permitPackages', initialPermitPackages);
-  const [contractors] = useLocalStorage<Contractor[]>('contractors', initialContractors);
+  const firestore = useFirestore();
+  const { user } = useUser();
+  
+  const packagesQuery = useMemoFirebase(() => {
+    if (!user) return null;
+    return query(collection(firestore, 'users', user.uid, 'permitPackages'));
+  }, [firestore, user]);
+
+  const { data: permitPackages } = useCollection<PermitPackage>(packagesQuery);
   
   const [statusFilter, setStatusFilter] = useState('all');
   const [contractorFilter, setContractorFilter] = useState('all');
 
-  const filteredPackages = permitPackages.filter((pkg) => {
+  const filteredPackages = (permitPackages || []).filter((pkg) => {
     const statusMatch = statusFilter === 'all' || pkg.status === statusFilter;
     const contractorMatch = contractorFilter === 'all' || pkg.contractor.id === contractorFilter;
     return statusMatch && contractorMatch;

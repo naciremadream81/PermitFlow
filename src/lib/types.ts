@@ -1,4 +1,3 @@
-
 export type Status = 'Draft' | 'In Progress' | 'Submitted' | 'Approved' | 'Rejected';
 
 export type Address = {

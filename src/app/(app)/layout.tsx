@@ -14,11 +14,13 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, FileText, HardHat, LogOut, BarChart } from 'lucide-react';
+import { LayoutDashboard, FileText, HardHat, LogOut, BarChart, Upload } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
+import { FirebaseClientProvider, useAuth, useUser } from '@/firebase';
+import { initiateEmailSignIn } from '@/firebase/non-blocking-login';
 
 function AppLogo() {
   return (
@@ -33,68 +35,103 @@ function AppLogo() {
   );
 }
 
+function UserProfile() {
+    const { user, isUserLoading } = useUser();
+    const auth = useAuth();
+    
+    const handleSignOut = () => {
+        if (auth) {
+            auth.signOut();
+        }
+    }
+
+    if (isUserLoading) {
+        return (
+             <div className="flex items-center gap-3 p-2 rounded-lg bg-sidebar-accent">
+                <Avatar className="h-9 w-9">
+                    <AvatarFallback>...</AvatarFallback>
+                </Avatar>
+            </div>
+        )
+    }
+
+    return (
+        <div className="flex items-center gap-3 p-2 rounded-lg bg-sidebar-accent">
+            <Avatar className="h-9 w-9">
+                <AvatarImage src={user?.photoURL ?? "https://picsum.photos/100"} alt={user?.displayName ?? 'Anonymous User'} data-ai-hint="person avatar" />
+                <AvatarFallback>{user?.email?.[0]?.toUpperCase() ?? 'A'}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 overflow-hidden">
+                <p className="text-sm font-medium text-sidebar-accent-foreground truncate">{user?.displayName ?? 'Anonymous User'}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email ?? 'anonymous@permitflow.com'}</p>
+            </div>
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-sidebar-accent-foreground" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4" />
+            </Button>
+        </div>
+    )
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <AppLogo />
-        </SidebarHeader>
-        <SidebarContent className="p-2">
-          <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard')} tooltip="Dashboard">
-                    <Link href="/dashboard">
-                        <LayoutDashboard />
-                        Dashboard
+    <FirebaseClientProvider>
+      <SidebarProvider>
+        <Sidebar>
+          <SidebarHeader>
+            <AppLogo />
+          </SidebarHeader>
+          <SidebarContent className="p-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/dashboard')} tooltip="Dashboard">
+                      <Link href="/dashboard">
+                          <LayoutDashboard />
+                          Dashboard
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname.startsWith('/uploads')} tooltip="Upload Package">
+                     <Link href="/uploads">
+                        <Upload />
+                        Upload Package
                     </Link>
                 </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith('/templates')} tooltip="Templates">
-                     <Link href="/templates">
-                        <FileText />
-                        PDF Templates
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-             <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith('/contractors')} tooltip="Contractors">
-                    <Link href="/contractors">
-                        <HardHat />
-                        Contractors
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith('/reports')} tooltip="Reports">
-                    <Link href="/reports">
-                        <BarChart />
-                        Reports
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter className="p-2">
-            <div className="flex items-center gap-3 p-2 rounded-lg bg-sidebar-accent">
-                <Avatar className="h-9 w-9">
-                    <AvatarImage src="https://picsum.photos/100" alt="Admin" data-ai-hint="person avatar" />
-                    <AvatarFallback>AD</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 overflow-hidden">
-                    <p className="text-sm font-medium text-sidebar-accent-foreground truncate">Admin User</p>
-                    <p className="text-xs text-muted-foreground truncate">admin@permitflow.com</p>
-                </div>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-sidebar-accent-foreground">
-                    <LogOut className="h-4 w-4" />
-                </Button>
-            </div>
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>{children}</SidebarInset>
-    </SidebarProvider>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/templates')} tooltip="Templates">
+                      <Link href="/templates">
+                          <FileText />
+                          PDF Templates
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/contractors')} tooltip="Contractors">
+                      <Link href="/contractors">
+                          <HardHat />
+                          Contractors
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild isActive={pathname.startsWith('/reports')} tooltip="Reports">
+                      <Link href="/reports">
+                          <BarChart />
+                          Reports
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarContent>
+          <SidebarFooter className="p-2">
+              <UserProfile />
+          </SidebarFooter>
+        </Sidebar>
+        <SidebarInset>{children}</SidebarInset>
+      </SidebarProvider>
+    </FirebaseClientProvider>
   );
 }

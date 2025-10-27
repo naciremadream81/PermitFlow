@@ -21,7 +21,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
     DropdownMenu,
@@ -30,12 +29,10 @@ import {
     DropdownMenuTrigger,
   } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import useLocalStorage from '@/hooks/use-local-storage';
-import { contractors as initialContractors } from '@/lib/data';
-import type { Contractor } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from './ui/form';
+import type { Contractor } from '@/lib/types';
+import { contractors as initialContractors } from '@/lib/data';
 
 const contractorSchema = z.object({
     name: z.string().min(2, 'Company name is required'),
@@ -54,8 +51,10 @@ const contractorSchema = z.object({
 
 type ContractorFormValues = z.infer<typeof contractorSchema>;
 
+// NOTE: This component is currently using mock data.
+// In a real application, this would be wired up to Firestore.
 export function ContractorManager() {
-  const [contractors, setContractors] = useLocalStorage<Contractor[]>('contractors', initialContractors);
+  const [contractors, setContractors] = useState<Contractor[]>(initialContractors);
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingContractor, setEditingContractor] = useState<Contractor | null>(null);
   const { toast } = useToast();

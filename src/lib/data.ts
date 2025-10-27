@@ -1,5 +1,5 @@
 
-import type { PermitPackage, Customer, Contractor, Property, PDFTemplate, PermitType } from './types';
+import type { PermitPackage, Customer, Contractor, Property, PDFTemplate, PermitType, ChecklistItem } from './types';
 
 const floridaAddress = { street: '123 Sunshine State St', city: 'Miami', state: 'FL', zip: '33101' };
 
@@ -31,11 +31,11 @@ export const floridaCounties: string[] = [
     "Suwannee", "Taylor", "Union", "Volusia", "Wakulla", "Walton", "Washington"
 ];
 
-export const standardPackageChecklist = [
-  { id: 'std_01', text: 'Completed Permit Application', completed: false },
-  { id: 'std_02', text: 'Notice of Commencement', completed: false },
-  { id: 'std_03', text: 'Contractor License & Insurance', completed: false },
-  { id: 'std_04', text: 'Owner-Builder Disclosure (if applicable)', completed: false },
+export const standardPackageChecklist: ChecklistItem[] = [
+  { id: 'std_01', text: 'Completed Permit Application', completed: false, attachments: [] },
+  { id: 'std_02', text: 'Notice of Commencement', completed: false, attachments: [] },
+  { id: 'std_03', text: 'Contractor License & Insurance', completed: false, attachments: [] },
+  { id: 'std_04', text: 'Owner-Builder Disclosure (if applicable)', completed: false, attachments: [] },
 ];
 
 export const permitTypes: PermitType[] = [
