@@ -230,7 +230,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     setGeneratedData(null);
     setIsGenerating(false);
   }, [permit, open]);
-
+  
   if (!permit) return null;
 
   const handleStandardChecklistChange = (itemId: string, checked: boolean) => {
@@ -552,5 +552,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     </>
   );
 }
+
+    
 
     
