@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, FileText, CheckSquare, HardHat, LogOut, BarChart, UploadCloud } from 'lucide-react';
+import { LayoutDashboard, FileText, CheckSquare, HardHat, LogOut, BarChart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,7 +24,7 @@ function AppLogo() {
   return (
     <div className="flex items-center gap-2.5 p-2">
       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M12.4 2.7c.3-.3.8-.3 1.1 0l7.1 7.1c.3.3.3.8 0 1.1l-7.1 7.1c-.3.3-.8.3-1.1 0l-7.1-7.1c-.3-.3-.3-.8 0-1.1l7.1-7.1z"/><path d="M5.3 9.8 2.7 12.4c-.3.3-.3.8 0 1.1l7.1 7.1c.3.3.8.3 1.1 0l2.6-2.6"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><path d="M12.4 2.7c.3-.3.8-.3 1.1 0l7.1 7.1c.3.3.3.8 0 1.1l-7.1 7.1c-.3-.3-.8-.3-1.1 0l-7.1-7.1c-.3-.3-.3-.8 0-1.1l7.1-7.1z"/><path d="M5.3 9.8 2.7 12.4c-.3.3-.3.8 0 1.1l7.1 7.1c.3.3.8.3 1.1 0l2.6-2.6"/></svg>
       </div>
       <h1 className="text-lg font-bold text-sidebar-foreground">PermitFlow</h1>
       <div className="flex-1" />
@@ -49,14 +49,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <Link href="/dashboard">
                         <LayoutDashboard />
                         Dashboard
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith('/uploads')} tooltip="Uploads">
-                     <Link href="/uploads">
-                        <UploadCloud />
-                        Upload Package
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
