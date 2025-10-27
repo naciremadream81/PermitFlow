@@ -76,11 +76,12 @@ const ChecklistComponent = ({
     removeAttachment: (itemId: string, fileToRemove: File) => void;
     fileInputRefs: React.MutableRefObject<Record<string, HTMLInputElement | null>>;
 }) => {
+    const safeChecklist = checklist || [];
     return (
         <div>
             <h3 className="text-lg font-semibold mb-3">{title}</h3>
             <div className="space-y-3">
-            {checklist.map((item) => (
+            {safeChecklist.map((item) => (
                 <div key={item.id} className="p-3 border rounded-lg">
                 <div className="flex items-center space-x-3">
                     <Checkbox
