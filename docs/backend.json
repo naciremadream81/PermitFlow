@@ -1,0 +1,377 @@
+{
+  "entities": {
+    "PermitPackage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PermitPackage",
+      "type": "object",
+      "description": "Represents a permit package, tracking its progress and associated data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Permit Package."
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Reference to the Customer associated with this permit package. (Relationship: Customer 1:N PermitPackage)"
+        },
+        "primaryContractorId": {
+          "type": "string",
+          "description": "Reference to the Primary Contractor associated with this permit package. (Relationship: Contractor 1:N PermitPackage)"
+        },
+        "propertyId": {
+          "type": "string",
+          "description": "Reference to the Property where the permitted work is being done. (Relationship: Property 1:N PermitPackage)"
+        },
+        "county": {
+          "type": "string",
+          "description": "The county where the property is located, used for checklist selection."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the permit package (e.g., 'Draft', 'Submitted', 'Approved')."
+        },
+        "permitType": {
+          "type": "string",
+          "description": "The type of permit (e.g., 'Electrical', 'Plumbing', 'Modular Home')."
+        },
+        "checklistId": {
+          "type": "string",
+          "description": "Reference to the Checklist associated with this permit package. (Relationship: Checklist 1:N PermitPackage)"
+        },
+        "documentIds": {
+          "type": "array",
+          "description": "References to Documents attached to this permit package. (Relationship: Document 1:N PermitPackage)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "customerId",
+        "primaryContractorId",
+        "propertyId",
+        "county",
+        "status",
+        "permitType",
+        "checklistId"
+      ]
+    },
+    "Customer": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Customer",
+      "type": "object",
+      "description": "Represents a customer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Customer."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the customer."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the customer."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the customer.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the customer."
+        },
+        "address": {
+          "type": "string",
+          "description": "The address of the customer."
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "address"
+      ]
+    },
+    "Contractor": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Contractor",
+      "type": "object",
+      "description": "Represents a contractor (primary or subcontractor).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Contractor."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the contractor."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the contractor."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the contractor.",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number of the contractor."
+        },
+        "companyName": {
+          "type": "string",
+          "description": "The name of the contractor's company."
+        },
+        "licenseNumber": {
+          "type": "string",
+          "description": "The contractor's license number."
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "phone",
+        "companyName",
+        "licenseNumber"
+      ]
+    },
+    "Property": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Property",
+      "type": "object",
+      "description": "Represents a property where work is being performed.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Property."
+        },
+        "address": {
+          "type": "string",
+          "description": "The street address of the property."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city where the property is located."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state where the property is located."
+        },
+        "zipCode": {
+          "type": "string",
+          "description": "The zip code of the property."
+        },
+        "legalDescription": {
+          "type": "string",
+          "description": "The legal description of the property."
+        }
+      },
+      "required": [
+        "id",
+        "address",
+        "city",
+        "state",
+        "zipCode",
+        "legalDescription"
+      ]
+    },
+    "Checklist": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Checklist",
+      "type": "object",
+      "description": "Represents a checklist for a permit package, specific to a county.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Checklist."
+        },
+        "county": {
+          "type": "string",
+          "description": "The county this checklist applies to."
+        },
+        "items": {
+          "type": "array",
+          "description": "List of checklist items.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "county",
+        "items"
+      ]
+    },
+    "Document": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Document",
+      "type": "object",
+      "description": "Represents a document attached to a permit package.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Document."
+        },
+        "fileName": {
+          "type": "string",
+          "description": "The name of the file."
+        },
+        "fileType": {
+          "type": "string",
+          "description": "The type of the file (e.g., 'pdf', 'image')."
+        },
+        "fileSize": {
+          "type": "number",
+          "description": "The size of the file in bytes."
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "The date and time the file was uploaded.",
+          "format": "date-time"
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "The URL where the file is stored.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "fileName",
+        "fileType",
+        "fileSize",
+        "uploadDate",
+        "fileUrl"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "Customer",
+          "schema": {
+            "$ref": "#/backend/entities/Customer"
+          },
+          "description": "Stores customer data.  Accessible only to the user with the matching userId.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (customer)."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/permitPackages/{permitPackageId}",
+        "definition": {
+          "entityName": "PermitPackage",
+          "schema": {
+            "$ref": "#/backend/entities/PermitPackage"
+          },
+          "description": "Stores permit packages associated with a specific user.  Accessible only to the user with the matching userId.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (customer)."
+            },
+            {
+              "name": "permitPackageId",
+              "description": "The unique identifier for the permit package."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/permitPackages/{permitPackageId}/documents/{documentId}",
+        "definition": {
+          "entityName": "Document",
+          "schema": {
+            "$ref": "#/backend/entities/Document"
+          },
+          "description": "Stores documents associated with a specific permit package.  Accessible only to the user with the matching userId and the specific permit package.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user (customer)."
+            },
+            {
+              "name": "permitPackageId",
+              "description": "The unique identifier for the permit package."
+            },
+            {
+              "name": "documentId",
+              "description": "The unique identifier for the document."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/contractors/{contractorId}",
+        "definition": {
+          "entityName": "Contractor",
+          "schema": {
+            "$ref": "#/backend/entities/Contractor"
+          },
+          "description": "Stores contractor data.",
+          "params": [
+            {
+              "name": "contractorId",
+              "description": "The unique identifier for the contractor."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/properties/{propertyId}",
+        "definition": {
+          "entityName": "Property",
+          "schema": {
+            "$ref": "#/backend/entities/Property"
+          },
+          "description": "Stores property data.",
+          "params": [
+            {
+              "name": "propertyId",
+              "description": "The unique identifier for the property."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/checklists/{checklistId}",
+        "definition": {
+          "entityName": "Checklist",
+          "schema": {
+            "$ref": "#/backend/entities/Checklist"
+          },
+          "description": "Stores county-specific checklists.",
+          "params": [
+            {
+              "name": "checklistId",
+              "description": "The unique identifier for the checklist."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to provide a secure, scalable, and easily manageable data architecture for PermitFlow, focusing on authorization independence and clear separation of concerns.  The core principle is Authorization Independence.  This is achieved by denormalizing relevant authorization data (customer ownership) into subcollections where needed.\n\n*   **Users (Customers and Contractors):** User data is stored in a path-based structure under `/users/{userId}`. This provides private access to their own data and facilitates easy management and scaling of user-specific data.\n*   **Permit Packages:** Permit packages are structured under the customer's path (`/users/{customerId}/permitPackages/{permitPackageId}`).  This enforces clear ownership and simplifies security rules based on user roles.\n*   **Properties:** Property data is stored in a top-level collection `/properties/{propertyId}`. Permit Packages reference these properties. Access will be controlled using a combination of customer-owned data (via Permit Packages) and potentially membership maps for collaborative scenarios, should they arise.\n*   **Checklists:** County-specific checklists are stored in `/checklists/{checklistId}`. Permit packages reference these checklists.\n*   **Documents:** Documents are stored within the permit package context (`/users/{customerId}/permitPackages/{permitPackageId}/documents/{documentId}`). This ensures that documents are always associated with a permit package and are accessible only to authorized users.\n\n**Authorization Independence (Denormalization):**\nAuthorization independence is primarily achieved through path-based ownership for user-specific data. The `/users/{userId}/permitPackages/{permitPackageId}` structure ensures that access to permit packages is controlled by the user ID in the path. While the data model includes customer, contractor and property references, no `get()` calls are required to validate ownership because the package is a subcollection of the user.\n\n**QAPs (Rules are not Filters):**\nQAPs are supported through structural segregation and path-based ownership. Listing permit packages is secured by querying the `/users/{userId}/permitPackages` collection. Rules can efficiently filter permit packages based on the user ID in the path, ensuring that users can only list their own permit packages. All documents in the collection follow the same access rules, eliminating the need for complex filtering logic in the security rules."
+  }
+}
