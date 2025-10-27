@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
-import { LayoutDashboard, FileText, HardHat, LogOut, BarChart, Upload } from 'lucide-react';
+import { LayoutDashboard, FileText, HardHat, LogOut, BarChart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -49,14 +49,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <Link href="/dashboard">
                         <LayoutDashboard />
                         Dashboard
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname.startsWith('/uploads')} tooltip="Upload Package">
-                     <Link href="/uploads">
-                        <Upload />
-                        Upload Package
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>

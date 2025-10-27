@@ -96,29 +96,36 @@ export default function DashboardPage() {
 
         <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredPackages.map((pkg) => (
-            <Card key={pkg.id} className="flex flex-col">
+            <Card key={pkg.id} className="flex flex-col cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setSelectedPermit(pkg)}>
               <CardHeader className="pb-4">
                 <div className="flex justify-between items-start gap-2">
-                  <CardTitle className="leading-tight text-lg cursor-pointer hover:underline" onClick={() => setSelectedPermit(pkg)}>{pkg.packageName}</CardTitle>
+                  <CardTitle className="leading-tight text-lg">{pkg.packageName}</CardTitle>
                   <Badge variant="secondary" className={statusColors[pkg.status]}>
                     {pkg.status}
                   </Badge>
                 </div>
                 <CardDescription className="text-xs !mt-1">{pkg.id}</CardDescription>
               </CardHeader>
-              <CardContent className="flex-1 space-y-3">
-                 <div className="text-sm text-muted-foreground space-y-2">
-                    <p><span className="font-medium text-foreground">Customer:</span> {pkg.customer.name}</p>
-                    <p><span className="font-medium text-foreground">County:</span> {pkg.county}</p>
+              <CardContent className="flex-1 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                 <div className="text-muted-foreground">
+                    <p className="font-medium text-foreground text-xs">Customer</p> 
+                    <p>{pkg.customer.name}</p>
+                 </div>
+                 <div className="text-muted-foreground">
+                    <p className="font-medium text-foreground text-xs">County</p>
+                    <p>{pkg.county}</p>
+                 </div>
+                 <div className="text-muted-foreground">
+                    <p className="font-medium text-foreground text-xs">Contractor</p>
+                    <p>{pkg.contractor.name}</p>
+                 </div>
+                  <div className="text-muted-foreground">
+                    <p className="font-medium text-foreground text-xs">Created</p>
+                    <p>{new Date(pkg.createdAt).toLocaleDateString()}</p>
                  </div>
               </CardContent>
               <CardFooter>
-                 <Button asChild variant="outline" className="w-full">
-                    <Link href="/uploads">
-                        <Upload className="mr-2 h-4 w-4" />
-                        Manage Documents
-                    </Link>
-                 </Button>
+                 <p className="text-xs text-muted-foreground">Click to view details</p>
               </CardFooter>
             </Card>
           ))}
