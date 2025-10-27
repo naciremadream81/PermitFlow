@@ -1,12 +1,12 @@
-
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Search, User, HardHat, MapPin, Calendar } from 'lucide-react';
+import { PlusCircle, Search, User, HardHat, MapPin, Calendar, Upload } from 'lucide-react';
 import { permitPackages as initialPermitPackages, floridaCounties } from '@/lib/data';
 import type { PermitPackage, Status } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,13 +22,6 @@ const statusColors: { [key in Status]: string } = {
   Approved: 'border-transparent bg-green-200 text-green-800 hover:bg-green-200/80',
   Rejected: 'border-transparent bg-red-200 text-red-800 hover:bg-red-200/80',
 };
-
-const DetailItem = ({ icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        {React.createElement(icon, { className: 'h-4 w-4' })}
-        <span>{children}</span>
-    </div>
-);
 
 export default function DashboardPage() {
   const [packages, setPackages] = useLocalStorage<PermitPackage[]>('permitPackages', initialPermitPackages);
@@ -103,10 +96,10 @@ export default function DashboardPage() {
 
         <div className="grid gap-4 md:gap-6 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {filteredPackages.map((pkg) => (
-            <Card key={pkg.id} className="flex flex-col cursor-pointer hover:shadow-lg transition-shadow duration-300" onClick={() => setSelectedPermit(pkg)}>
+            <Card key={pkg.id} className="flex flex-col">
               <CardHeader className="pb-4">
                 <div className="flex justify-between items-start gap-2">
-                  <CardTitle className="leading-tight text-lg">{pkg.packageName}</CardTitle>
+                  <CardTitle className="leading-tight text-lg cursor-pointer hover:underline" onClick={() => setSelectedPermit(pkg)}>{pkg.packageName}</CardTitle>
                   <Badge variant="secondary" className={statusColors[pkg.status]}>
                     {pkg.status}
                   </Badge>
@@ -114,16 +107,18 @@ export default function DashboardPage() {
                 <CardDescription className="text-xs !mt-1">{pkg.id}</CardDescription>
               </CardHeader>
               <CardContent className="flex-1 space-y-3">
-                 <p className="text-sm text-muted-foreground line-clamp-2">{pkg.descriptionOfWork}</p>
-                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2">
-                    <DetailItem icon={User}>{pkg.customer.name}</DetailItem>
-                    <DetailItem icon={HardHat}>{pkg.contractor.name}</DetailItem>
-                    <DetailItem icon={MapPin}>{pkg.county}</DetailItem>
-                    <DetailItem icon={Calendar}>{new Date(pkg.createdAt).toLocaleDateString()}</DetailItem>
+                 <div className="text-sm text-muted-foreground space-y-2">
+                    <p><span className="font-medium text-foreground">Customer:</span> {pkg.customer.name}</p>
+                    <p><span className="font-medium text-foreground">County:</span> {pkg.county}</p>
                  </div>
               </CardContent>
               <CardFooter>
-                 
+                 <Button asChild variant="outline" className="w-full">
+                    <Link href="/uploads">
+                        <Upload className="mr-2 h-4 w-4" />
+                        Manage Documents
+                    </Link>
+                 </Button>
               </CardFooter>
             </Card>
           ))}
