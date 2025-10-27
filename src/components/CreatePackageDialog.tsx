@@ -91,9 +91,10 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
           id: `new_${data.county}_${data.permitTypeId}_${index}`,
           text: item.text,
           completed: false,
+          attachments: []
       }));
     } else {
-      rawChecklist.push(...fallbackChecklist);
+       rawChecklist = fallbackChecklist.map(item => ({...item, attachments: []}));
     }
 
     const newPackage: PermitPackage = {
@@ -121,7 +122,6 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
         },
       },
       checklist: rawChecklist,
-      attachments: [],
       createdAt: new Date().toISOString(),
       descriptionOfWork: data.descriptionOfWork,
       buildingUse: data.buildingUse,
@@ -421,5 +421,3 @@ export function CreatePackageDialog({ open, onOpenChange, onPackageCreate }: Cre
     </Dialog>
   );
 }
-
-    

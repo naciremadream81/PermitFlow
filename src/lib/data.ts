@@ -113,7 +113,6 @@ export const permitPackages: PermitPackage[] = [
     subcontractors: [contractors[2], contractors[3], contractors[4]],
     property: properties[0],
     checklist: countyData.find(c => c.name === 'Miami-Dade')?.checklist || [],
-    attachments: [],
     createdAt: '2024-07-28T10:00:00Z',
     descriptionOfWork: 'New single family home construction',
     buildingUse: 'Single Family Residential',
@@ -129,7 +128,6 @@ export const permitPackages: PermitPackage[] = [
     subcontractors: [],
     property: properties[1],
     checklist: countyData.find(c => c.name === 'Orange')?.checklist || [],
-    attachments: [],
     createdAt: '2024-07-29T14:30:00Z',
     descriptionOfWork: 'Installation of a new modular home on existing lot.',
     buildingUse: 'Modular Home',
@@ -146,7 +144,6 @@ export const permitPackages: PermitPackage[] = [
     subcontractors: [],
     property: { id: 'prop_003', parcelId: '03-4567-000-0000', address: { street: '789 Lake Rd', city: 'Lakeland', state: 'FL', zip: '33801' } },
     checklist: countyData.find(c => c.name === 'Polk')?.checklist || [],
-    attachments: [],
     createdAt: '2024-07-30T09:00:00Z',
     descriptionOfWork: 'Site prep and setup for a new manufactured home.',
     buildingUse: 'Manufactured Home',
@@ -169,5 +166,3 @@ export const pdfTemplates: PDFTemplate[] = [
         dataUri: 'data:application/pdf;base64,JVBERi0xLjQKJSAg...JUI1NvbW1lbmNlbWVudC4pIFRqCkVNCmVuZHN0cmVhbQplbmRvYmoKCjYgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCnhyZWYKMCA3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMDYxIDAwMDAwIG4gCjAwMDAwMDAxMTUgMDAwMDAgbiAKMDAwMDAwMjA5IDAwMDAwIG4gCjAwMDAwMDAzMDUgMDAwMDAgbiAKMDAwMDAwMDM3MyAwMDAwMCBuIAp0cmFpbGVyCjw8L1Jvb3QgMSAwIFIvU2l6ZSA3Pj4Kc3RhcnR4cmVmCjQyOQolJUVPRgo='
     }
 ];
-
-    

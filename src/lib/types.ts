@@ -39,6 +39,7 @@ export type ChecklistItem = {
   id: string;
   text: string;
   completed: boolean;
+  attachments?: File[];
 };
 
 export type County = {
@@ -56,7 +57,6 @@ export type PermitPackage = {
   subcontractors?: Contractor[];
   property: Property;
   checklist: ChecklistItem[];
-  attachments: File[];
   createdAt: string;
   // New fields from permit application
   descriptionOfWork: string;
@@ -82,12 +82,10 @@ export type PermitType = {
   name: string;
 };
 
-export type BareChecklistItem = Omit<ChecklistItem, 'id' | 'completed'>;
+export type BareChecklistItem = Omit<ChecklistItem, 'id' | 'completed' | 'attachments'>;
 
 export interface CountyPermitChecklists {
   [county: string]: {
     [permitTypeId: string]: BareChecklistItem[];
   };
 }
-
-    

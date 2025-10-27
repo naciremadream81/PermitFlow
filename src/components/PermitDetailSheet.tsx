@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -12,7 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import type { PermitPackage, PDFTemplate, Contractor } from '@/lib/types';
+import type { PermitPackage, PDFTemplate, Contractor, ChecklistItem } from '@/lib/types';
 import {
   FileText,
   User,
@@ -22,7 +23,6 @@ import {
   Paperclip,
   Upload,
   Loader2,
-  Download,
   X,
   Building,
   Wrench,
@@ -146,14 +146,9 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
   const [isDataDialogOpen, setDataDialogOpen] = React.useState(false);
   const [isSubcontractorDialogOpen, setSubcontractorDialogOpen] = React.useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = React.useState<string | undefined>();
-  const [attachments, setAttachments] = React.useState<File[]>(permit?.attachments || []);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  
+  const fileInputRefs = React.useRef<Record<string, HTMLInputElement | null>>({});
 
   React.useEffect(() => {
-    if (permit) {
-      setAttachments(permit.attachments);
-    }
     // Reset generation state when sheet closes or permit changes
     setGeneratedData(null);
     setIsGenerating(false);
@@ -168,23 +163,41 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     onUpdatePackage({ ...permit, checklist: updatedChecklist });
   };
   
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, itemId: string) => {
     if (event.target.files) {
       const newFiles = Array.from(event.target.files);
-      const updatedAttachments = [...attachments, ...newFiles];
-      setAttachments(updatedAttachments);
-      onUpdatePackage({ ...permit, attachments: updatedAttachments });
+      const updatedChecklist = permit.checklist.map((item) => {
+        if (item.id === itemId) {
+          const currentAttachments = item.attachments || [];
+          return { ...item, attachments: [...currentAttachments, ...newFiles] };
+        }
+        return item;
+      });
+      onUpdatePackage({ ...permit, checklist: updatedChecklist });
     }
   };
   
-  const removeAttachment = (fileToRemove: File) => {
-    const updatedAttachments = attachments.filter(file => file !== fileToRemove);
-    setAttachments(updatedAttachments);
-    onUpdatePackage({ ...permit, attachments: updatedAttachments });
+  const removeAttachment = (itemId: string, fileToRemove: File) => {
+    const updatedChecklist = permit.checklist.map((item) => {
+      if (item.id === itemId) {
+        const updatedAttachments = (item.attachments || []).filter(file => file !== fileToRemove);
+        return { ...item, attachments: updatedAttachments };
+      }
+      return item;
+    });
+    onUpdatePackage({ ...permit, checklist: updatedChecklist });
   };
+
+  const allAttachments = React.useMemo(() => {
+    const files = new Set<File>();
+    permit.checklist.forEach(item => {
+      item.attachments?.forEach(file => files.add(file));
+    });
+    return Array.from(files);
+  }, [permit.checklist]);
   
   const handleDownloadAll = async () => {
-    if (attachments.length === 0) {
+    if (allAttachments.length === 0) {
       toast({ variant: 'destructive', title: 'No files to download' });
       return;
     }
@@ -192,7 +205,7 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
     toast({ title: 'Zipping files...', description: 'Please wait while we prepare your download.' });
 
     const zip = new JSZip();
-    attachments.forEach(file => {
+    allAttachments.forEach(file => {
         zip.file(file.name, file);
     });
 
@@ -336,13 +349,41 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
               <h3 className="text-lg font-semibold mb-3">County Checklist</h3>
               <div className="space-y-3">
                 {permit.checklist.map((item) => (
-                  <div key={item.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={item.id}
-                      checked={item.completed}
-                      onCheckedChange={(checked) => handleChecklistChange(item.id, !!checked)}
-                    />
-                    <Label htmlFor={item.id} className={`flex-1 ${item.completed ? 'line-through text-muted-foreground' : ''}`}>{item.text}</Label>
+                  <div key={item.id} className="p-3 border rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <Checkbox
+                        id={item.id}
+                        checked={item.completed}
+                        onCheckedChange={(checked) => handleChecklistChange(item.id, !!checked)}
+                      />
+                      <Label htmlFor={item.id} className={`flex-1 ${item.completed ? 'line-through text-muted-foreground' : ''}`}>{item.text}</Label>
+                      <Button variant="outline" size="sm" onClick={() => fileInputRefs.current[item.id]?.click()}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Attach
+                      </Button>
+                      <input
+                        type="file"
+                        ref={el => (fileInputRefs.current[item.id] = el)}
+                        onChange={(e) => handleFileChange(e, item.id)}
+                        className="hidden"
+                        multiple
+                      />
+                    </div>
+                    {item.attachments && item.attachments.length > 0 && (
+                      <div className="pl-8 pt-2 space-y-1">
+                        {item.attachments.map((file, index) => (
+                          <div key={index} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Paperclip className="h-3 w-3" />
+                              <span>{file.name}</span>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => removeAttachment(item.id, file)}>
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -352,30 +393,24 @@ export function PermitDetailSheet({ permit, open, onOpenChange, onUpdatePackage 
 
             <div>
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-semibold">Attachments</h3>
-                <Button variant="secondary" size="sm" onClick={handleDownloadAll} disabled={attachments.length === 0}>
+                <h3 className="text-lg font-semibold">Package Documents</h3>
+                 <Button variant="secondary" size="sm" onClick={handleDownloadAll} disabled={allAttachments.length === 0}>
                   <DownloadCloud className="mr-2 h-4 w-4" />
-                  Download All
+                  Download All ({allAttachments.length})
                 </Button>
               </div>
               <div className="space-y-2">
-                 {attachments.map((file, index) => (
+                 {allAttachments.length > 0 ? allAttachments.map((file, index) => (
                   <div key={index} className="flex items-center justify-between p-2 rounded-md border bg-secondary/50">
                       <div className="flex items-center gap-2">
                           <Paperclip className="h-4 w-4 text-muted-foreground" />
                           <span className="text-sm font-medium">{file.name}</span>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeAttachment(file)}>
-                          <X className="h-4 w-4" />
-                      </Button>
                   </div>
-                ))}
+                )) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">No documents have been attached yet.</p>
+                )}
               </div>
-              <Button variant="outline" className="w-full mt-3" onClick={() => fileInputRef.current?.click()}>
-                <Upload className="mr-2 h-4 w-4" />
-                Upload Document
-              </Button>
-              <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" multiple />
             </div>
 
             <Separator />
