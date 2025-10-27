@@ -20,13 +20,12 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import useLocalStorage from '@/hooks/use-local-storage';
 import { pdfTemplates as initialTemplates } from '@/lib/data';
 import type { PDFTemplate } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 export function TemplateManager() {
-  const [templates, setTemplates] = useLocalStorage<PDFTemplate[]>('pdfTemplates', initialTemplates);
+  const [templates, setTemplates] = useState<PDFTemplate[]>(initialTemplates);
   const [isAddDialogOpen, setAddDialogOpen] = useState(false);
   const [newTemplateName, setNewTemplateName] = useState('');
   const [newTemplateFile, setNewTemplateFile] = useState<File | null>(null);
